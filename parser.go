@@ -3,36 +3,36 @@ package bbcode
 import "io"
 
 type Converter interface {
-	Open(Tag) string
-	Close(Tag) string
+	Open(*Tag) string
+	Close(*Tag) string
 }
 
 type BBCodeConverter struct{}
 
-func (BBCodeConverter) Open(t Tag) string {
+func (BBCodeConverter) Open(t *Tag) string {
 	if t.Attribute != "" {
 		return "[" + t.Name + "=" + t.Attribute + "]"
 	}
 	return "[" + t.Name + "]"
 }
 
-func (BBCodeConverter) Close(t Tag) string {
+func (BBCodeConverter) Close(t *Tag) string {
 	return "[/" + t.Name + "]"
 }
 
 type Tag struct {
 	Name      string
 	Attribute string
-	Inner     []Tag
+	Inner     []*Tag
 	Closed    bool
 	Parent    *Tag
 }
 
-func (t Tag) BBCode() string {
+func (t *Tag) BBCode() string {
 	return t.Export(BBCodeConverter{})
 }
 
-func (t Tag) Export(c Converter) string {
+func (t *Tag) Export(c Converter) string {
 	if t.Name == "@TEXT@" {
 		return t.Attribute
 	}
@@ -49,13 +49,13 @@ func (t Tag) Export(c Converter) string {
 	return toRet
 }
 
-func Parse(text string) Tag {
+func Parse(text string) *Tag {
 	t := newTokeniser(text)
-	baseTag := Tag{
+	baseTag := &Tag{
 		Name: "@BASE@",
 	}
 
-	currTag := &baseTag
+	currTag := baseTag
 
 	for {
 		token, err := t.GetToken()
@@ -64,22 +64,22 @@ func Parse(text string) Tag {
 		}
 		switch token.typ {
 		case tokenText:
-			currTag.Inner = append(currTag.Inner, Tag{
+			currTag.Inner = append(currTag.Inner, &Tag{
 				Name:      "@TEXT@",
 				Attribute: token.data,
 			})
 		case tokenOpenTag:
-			newTag := Tag{
+			newTag := &Tag{
 				Name:   token.data,
 				Parent: currTag,
 			}
 			currTag.Inner = append(currTag.Inner, newTag)
-			currTag = &newTag
+			currTag = newTag
 		case tokenTagAttribute:
 			currTag.Attribute = token.data
 		case tokenCloseTag:
-			if token.data != currTag.Name {
-				currTag.Inner = append(currTag.Inner, Tag{
+			if token.data != currTag.Name { // Try matching down???
+				currTag.Inner = append(currTag.Inner, &Tag{
 					Name:      "@TEXT@",
 					Attribute: "[/" + token.data + "]",
 				})

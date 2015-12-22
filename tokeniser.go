@@ -9,7 +9,7 @@ import (
 type tokenType uint8
 
 const (
-	tokenText token = iota
+	tokenText tokenType = iota
 	tokenOpenTag
 	tokenTagAttribute
 	tokenCloseTag
@@ -65,10 +65,8 @@ func (t *tokeniser) text() (token, stateFn) {
 
 func (t *tokeniser) tag() (token, stateFn) {
 	t.p.Accept(openTag)
-	typ := tokenOpenTag
 	if t.p.Peek() == rune(closingTag[0]) {
-		t.p.Accept(closingTag)
-		typ = tokenCloseTag
+		return t.closingTag()
 	}
 	t.p.AcceptRun(validTagName)
 	var next stateFn
@@ -84,13 +82,23 @@ func (t *tokeniser) tag() (token, stateFn) {
 	t.p.Accept(closeTag + attributeSep)
 	t.p.Get()
 	data = data[1:]
-	if typ == tokenCloseTag {
-		data = data[1:]
-	}
 	return token{
-		typ,
+		tokenOpenTag,
 		data,
 	}, next
+}
+
+func (t *tokeniser) closingTag() (token, stateFn) {
+	t.p.Accept(closingTag)
+	t.p.AcceptRun(validTagName)
+	if t.p.Peek() == rune(closeTag[0]) {
+		data := t.p.Get()
+		return token{
+			tokenCloseTag,
+			data[2:],
+		}, t.text
+	}
+	return t.text()
 }
 
 func (t *tokeniser) attribute() (token, stateFn) {

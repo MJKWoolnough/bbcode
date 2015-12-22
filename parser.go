@@ -2,6 +2,24 @@ package bbcode
 
 import "io"
 
+type Converter interface {
+	Open(Tag) string
+	Close(Tag) string
+}
+
+type BBCodeConverter struct{}
+
+func (BBCodeConverter) Open(t Tag) string {
+	if t.Attribute != "" {
+		return "[" + t.Name + "=" + t.Attribute + "]"
+	}
+	return "[" + t.Name + "]"
+}
+
+func (BBCodeConverter) Close(t Tag) string {
+	return "[/" + t.Name + "]"
+}
+
 type Tag struct {
 	Name      string
 	Attribute string
@@ -11,11 +29,24 @@ type Tag struct {
 }
 
 func (t Tag) BBCode() string {
-	return ""
+	return t.Export(BBCodeConverter{})
 }
 
-func (t Tag) HTML() string {
-	return ""
+func (t Tag) Export(c Converter) string {
+	if t.Name == "@TEXT@" {
+		return t.Attribute
+	}
+	toRet := ""
+	if t.Name != "@BASE@" {
+		toRet += c.Open(t)
+	}
+	for _, tag := range t.Inner {
+		toRet += tag.Export(c)
+	}
+	if t.Name != "@BASE@" {
+		toRet += c.Close(t)
+	}
+	return toRet
 }
 
 func Parse(text string) Tag {

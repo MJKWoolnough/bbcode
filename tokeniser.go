@@ -9,8 +9,7 @@ import (
 type tokenType uint8
 
 const (
-	tokenError tokenType = iota
-	tokenText
+	tokenText token = iota
 	tokenOpenTag
 	tokenTagAttribute
 	tokenCloseTag
@@ -47,18 +46,8 @@ func newTokeniser(data string) *tokeniser {
 }
 
 func (t *tokeniser) GetToken() (token, error) {
-	if t.err == io.EOF {
-		return token{tokenDone, ""}, io.EOF
-	}
 	var tk token
 	tk, t.state = t.state()
-	if t.err == io.EOF {
-		if tk.typ == tokenError {
-			t.err = io.ErrUnexpectedEOF
-		} else {
-			return tk, nil
-		}
-	}
 	return tk, t.err
 }
 
@@ -118,11 +107,4 @@ func (t *tokeniser) attribute() (token, stateFn) {
 func (t *tokeniser) done() (token, stateFn) {
 	t.err = io.EOF
 	return token{tokenDone, ""}, t.done
-}
-
-func (t *tokeniser) errorfn() (token, stateFn) {
-	return token{
-		tokenError,
-		t.err.Error(),
-	}, t.errorfn
 }

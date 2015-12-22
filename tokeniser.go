@@ -93,6 +93,8 @@ func (t *tokeniser) closingTag() (token, stateFn) {
 	t.p.AcceptRun(validTagName)
 	if t.p.Peek() == rune(closeTag[0]) {
 		data := t.p.Get()
+		t.p.Accept(closeTag)
+		t.p.Get()
 		return token{
 			tokenCloseTag,
 			data[2:],
@@ -106,9 +108,12 @@ func (t *tokeniser) attribute() (token, stateFn) {
 	if t.p.Peek() == -1 {
 		return t.text()
 	}
+	data := t.p.Get()
+	t.p.Accept(closeTag)
+	t.p.Get()
 	return token{
 		tokenTagAttribute,
-		t.p.Get(),
+		data,
 	}, t.text
 }
 

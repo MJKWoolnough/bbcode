@@ -2,13 +2,17 @@ package bbcode
 
 import "io"
 
+// Converter is an interface for converting the tag tree into a string
 type Converter interface {
 	Open(*Tag) string
 	Close(*Tag) string
 }
 
+// BBCodeConverter is a Converter that will translate a parsed tree back into
+// BBCode
 type BBCodeConverter struct{}
 
+// Open creates the opening of a BBCode tag
 func (BBCodeConverter) Open(t *Tag) string {
 	if t.Attribute != "" {
 		return "[" + t.Name + "=" + t.Attribute + "]"
@@ -16,10 +20,12 @@ func (BBCodeConverter) Open(t *Tag) string {
 	return "[" + t.Name + "]"
 }
 
+// Close creates the closing of a BBCode tag
 func (BBCodeConverter) Close(t *Tag) string {
 	return "[/" + t.Name + "]"
 }
 
+// Tag is a single tage/node in the BBCode tree
 type Tag struct {
 	Name      string
 	Attribute string
@@ -28,10 +34,12 @@ type Tag struct {
 	Parent    *Tag
 }
 
+// BBCode returns the tag and its children as a BBCode string
 func (t *Tag) BBCode() string {
 	return t.Export(BBCodeConverter{})
 }
 
+// Export converts the tree to the type specified by the converter
 func (t *Tag) Export(c Converter) string {
 	if t.Name == "@TEXT@" {
 		return t.Attribute
@@ -49,6 +57,7 @@ func (t *Tag) Export(c Converter) string {
 	return toRet
 }
 
+// Parse parses a BBCode string and generates a tag tree
 func Parse(text string) *Tag {
 	t := newTokeniser(text)
 	baseTag := &Tag{

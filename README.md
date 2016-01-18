@@ -2,6 +2,7 @@
 --
     import "github.com/MJKWoolnough/bbcode"
 
+Package BBCode implements a bbcode parser and converter
 
 ## Usage
 

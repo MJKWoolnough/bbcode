@@ -1,3 +1,4 @@
+// Package BBCode implements a bbcode parser and converter
 package bbcode
 
 import "io"

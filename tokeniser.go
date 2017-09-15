@@ -1,19 +1,12 @@
 package bbcode
 
-import (
-	"io"
-
-	"github.com/MJKWoolnough/parser"
-)
-
-type tokenType uint8
+import "github.com/MJKWoolnough/parser"
 
 const (
-	tokenText tokenType = iota
+	tokenText parser.TokenType = iota
 	tokenOpenTag
 	tokenTagAttribute
 	tokenCloseTag
-	tokenDone
 )
 
 const (
@@ -24,100 +17,83 @@ const (
 	attributeSep = "="
 )
 
-type token struct {
-	typ  tokenType
-	data string
+func newTokeniser(data string) *parser.Tokeniser {
+	t := parser.NewStringTokeniser(data)
+	t.TokeniserState(text)
+	return &t
 }
 
-type stateFn func() (token, stateFn)
-
-type tokeniser struct {
-	p     parser.Parser
-	state stateFn
-	err   error
-}
-
-func newTokeniser(data string) *tokeniser {
-	t := &tokeniser{
-		p: parser.NewStringParser(data),
-	}
-	t.state = t.text
-	return t
-}
-
-func (t *tokeniser) GetToken() (token, error) {
-	var tk token
-	tk, t.state = t.state()
-	return tk, t.err
-}
-
-func (t *tokeniser) text() (token, stateFn) {
-	t.p.ExceptRun(openTag)
-	tk := token{
+func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.ExceptRun(openTag)
+	tk := parser.Token{
 		tokenText,
-		t.p.Get(),
+		t.Get(),
 	}
-	if t.p.Peek() == -1 {
-		return tk, t.done
+	if t.Peek() == -1 {
+		return tk, done
 	}
-	return tk, t.tag
+	return tk, opening
 }
 
-func (t *tokeniser) tag() (token, stateFn) {
-	t.p.Accept(openTag)
-	if t.p.Peek() == rune(closingTag[0]) {
-		return t.closingTag()
+func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.Accept(openTag)
+	if t.Peek() == rune(closingTag[0]) {
+		return closing(t)
 	}
-	t.p.AcceptRun(validTagName)
-	var next stateFn
-	switch t.p.Peek() {
+	t.AcceptRun(validTagName)
+	var (
+		next parser.TokenFunc
+		data string
+	)
+	switch t.Peek() {
 	case rune(closeTag[0]):
-		next = t.text
+		next = text
+		data = t.Get()
+		t.Accept(closeTag)
 	case rune(attributeSep[0]):
-		next = t.attribute
+		next = attribute
+		data = t.Get()
+		t.Accept(attributeSep)
 	default:
-		return t.text()
+		return text(t)
 	}
-	data := t.p.Get()
-	t.p.Accept(closeTag + attributeSep)
-	t.p.Get()
+	t.Get()
 	data = data[1:]
-	return token{
+	return parser.Token{
 		tokenOpenTag,
 		data,
 	}, next
 }
 
-func (t *tokeniser) closingTag() (token, stateFn) {
-	t.p.Accept(closingTag)
-	t.p.AcceptRun(validTagName)
-	if t.p.Peek() == rune(closeTag[0]) {
-		data := t.p.Get()
-		t.p.Accept(closeTag)
-		t.p.Get()
-		return token{
+func closing(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.Accept(closingTag)
+	t.AcceptRun(validTagName)
+	if t.Peek() == rune(closeTag[0]) {
+		data := t.Get()
+		t.Accept(closeTag)
+		t.Get()
+		return parser.Token{
 			tokenCloseTag,
 			data[2:],
-		}, t.text
+		}, text
 	}
-	return t.text()
+	return text(t)
 }
 
-func (t *tokeniser) attribute() (token, stateFn) {
-	t.p.ExceptRun(closeTag)
-	if t.p.Peek() == -1 {
-		return t.text()
+func attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.ExceptRun(closeTag)
+	if t.Peek() == -1 {
+		return text(t)
 	}
-	data := t.p.Get()
-	t.p.Accept(closeTag)
-	t.p.Get()
-	return token{
+	data := t.Get()
+	t.Accept(closeTag)
+	t.Get()
+	return parser.Token{
 		tokenTagAttribute,
 		data,
-	}, t.text
+	}, text
 }
 
-func (t *tokeniser) done() (token, stateFn) {
-	t.err = io.EOF
-	return token{tokenDone, ""}, t.done
+func done(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	return t.Done()
 }

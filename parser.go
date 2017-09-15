@@ -1,7 +1,11 @@
 // Package bbcode implements a bbcode parser and converter
 package bbcode
 
-import "io"
+import (
+	"io"
+
+	"github.com/MJKWoolnough/parser"
+)
 
 // Converter is an interface for converting the tag tree into a string
 type Converter interface {
@@ -72,32 +76,32 @@ func Parse(text string) *Tag {
 		if err == io.EOF {
 			break
 		}
-		switch token.typ {
+		switch token.Type {
 		case tokenText:
 			currTag.Inner = append(currTag.Inner, &Tag{
 				Name:      "@TEXT@",
-				Attribute: token.data,
+				Attribute: token.Data,
 			})
 		case tokenOpenTag:
 			newTag := &Tag{
-				Name:   token.data,
+				Name:   token.Data,
 				Parent: currTag,
 			}
 			currTag.Inner = append(currTag.Inner, newTag)
 			currTag = newTag
 		case tokenTagAttribute:
-			currTag.Attribute = token.data
+			currTag.Attribute = token.Data
 		case tokenCloseTag:
-			if token.data != currTag.Name { // Try matching down???
+			if token.Data != currTag.Name { // Try matching down???
 				currTag.Inner = append(currTag.Inner, &Tag{
 					Name:      "@TEXT@",
-					Attribute: "[/" + token.data + "]",
+					Attribute: "[/" + token.Data + "]",
 				})
 			} else {
 				currTag.Closed = true
 				currTag = currTag.Parent
 			}
-		case tokenDone:
+		case parser.TokenDone:
 			break
 		}
 	}

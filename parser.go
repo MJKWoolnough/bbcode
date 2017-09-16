@@ -64,7 +64,7 @@ func (t *Tag) Export(c Converter) string {
 
 // Parse parses a BBCode string and generates a tag tree
 func Parse(text string) *Tag {
-	t := newTokeniser(text)
+	p := newTokeniser(text)
 	baseTag := &Tag{
 		Name: "@BASE@",
 	}
@@ -72,36 +72,37 @@ func Parse(text string) *Tag {
 	currTag := baseTag
 
 	for {
-		token, err := t.GetToken()
+		phrase, err := p.GetPhrase()
 		if err == io.EOF {
 			break
 		}
-		switch token.Type {
-		case tokenText:
+		switch phrase.Type {
+		case phraseText:
 			currTag.Inner = append(currTag.Inner, &Tag{
 				Name:      "@TEXT@",
-				Attribute: token.Data,
+				Attribute: phrase.Data[0].Data,
 			})
-		case tokenOpenTag:
+		case phraseOpen:
 			newTag := &Tag{
-				Name:   token.Data,
+				Name:   phrase.Data[0].Data,
 				Parent: currTag,
 			}
 			currTag.Inner = append(currTag.Inner, newTag)
 			currTag = newTag
-		case tokenTagAttribute:
-			currTag.Attribute = token.Data
-		case tokenCloseTag:
-			if token.Data != currTag.Name { // Try matching down???
+			if len(phrase.Data) > 1 {
+				currTag.Attribute = phrase.Data[1].Data
+			}
+		case phraseClose:
+			if phrase[0].Data[0].Data != currTag.Name { // Try matching down???
 				currTag.Inner = append(currTag.Inner, &Tag{
 					Name:      "@TEXT@",
-					Attribute: "[/" + token.Data + "]",
+					Attribute: "[/" + phrase.Data[0].Data + "]",
 				})
 			} else {
 				currTag.Closed = true
 				currTag = currTag.Parent
 			}
-		case parser.TokenDone:
+		case parser.PhraseDone:
 			break
 		}
 	}

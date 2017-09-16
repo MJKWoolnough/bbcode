@@ -1,12 +1,22 @@
 package bbcode
 
-import "github.com/MJKWoolnough/parser"
+import (
+	"errors"
+
+	"github.com/MJKWoolnough/parser"
+)
 
 const (
 	tokenText parser.TokenType = iota
 	tokenOpenTag
 	tokenTagAttribute
 	tokenCloseTag
+)
+
+const (
+	phraseText parser.PhraseType = iota
+	phraseOpen
+	phraseClose
 )
 
 const (
@@ -17,9 +27,10 @@ const (
 	attributeSep = "="
 )
 
-func newTokeniser(data string) *parser.Tokeniser {
-	t := parser.NewStringTokeniser(data)
-	t.TokeniserState(text)
+func newTokeniser(data string) *parser.Parser {
+	p := parser.New(parser.NewStringTokeniser(data))
+	p.TokeniserState(text)
+	p.PhraserState(phraserText)
 	return &t
 }
 
@@ -96,4 +107,59 @@ func attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 
 func done(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	return t.Done()
+}
+
+func phraserText(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+	var next parser.PhraseFunc
+	switch p.AcceptRun(tokenText) {
+	case parser.TokenDone:
+		next = phraserDone
+	case tokenOpenTag:
+		next = phraserOpen
+	case tokenCloseTag:
+		next = phraserClose
+	default:
+		p.Err = errors.New("invalid state")
+		return p.Error()
+	}
+	ts := p.Get()
+	if len(ts) == 0 {
+		return next()
+	} else if len(ts) > 1 {
+		var l int
+		for _, t := range ts {
+			l += string(t.Data)
+		}
+		str := make([]byte, 0, l)
+		for _, t := range ts {
+			str = append(str, t.Data...)
+		}
+		ts[0] = string(str)
+		ts = ts[:1]
+	}
+	return parser.Phrase{
+		phraseText,
+		ts,
+	}, next
+}
+
+func phraserOpen(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+	p.Accept(tokenOpenTag)
+	p.Accept(tokenTagAttribute)
+	return parser.Phrase{
+		phraseOpen,
+		p.Get(),
+	}, phraserText
+}
+
+func phraserClose(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+	p.Accept(tokenCloseTag)
+	return parser.Phrase{
+		phraseOpen,
+		p.Get(),
+	}, phraserText
+}
+
+func phraserDone(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+	return p.Done()
 }

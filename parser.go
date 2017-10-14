@@ -93,7 +93,7 @@ func Parse(text string) *Tag {
 				currTag.Attribute = phrase.Data[1].Data
 			}
 		case phraseClose:
-			if phrase[0].Data[0].Data != currTag.Name { // Try matching down???
+			if phrase.Data[0].Data != currTag.Name { // Try matching down???
 				currTag.Inner = append(currTag.Inner, &Tag{
 					Name:      "@TEXT@",
 					Attribute: "[/" + phrase.Data[0].Data + "]",

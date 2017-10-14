@@ -31,7 +31,7 @@ func newTokeniser(data string) *parser.Parser {
 	p := parser.New(parser.NewStringTokeniser(data))
 	p.TokeniserState(text)
 	p.PhraserState(phraserText)
-	return &t
+	return &p
 }
 
 func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
@@ -124,17 +124,17 @@ func phraserText(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	}
 	ts := p.Get()
 	if len(ts) == 0 {
-		return next()
+		return next(p)
 	} else if len(ts) > 1 {
 		var l int
 		for _, t := range ts {
-			l += string(t.Data)
+			l += len(t.Data)
 		}
 		str := make([]byte, 0, l)
 		for _, t := range ts {
 			str = append(str, t.Data...)
 		}
-		ts[0] = string(str)
+		ts[0].Data = string(str)
 		ts = ts[:1]
 	}
 	return parser.Phrase{

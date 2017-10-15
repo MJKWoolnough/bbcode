@@ -1,10 +1,6 @@
 package bbcode
 
-import (
-	"errors"
-
-	"github.com/MJKWoolnough/parser"
-)
+import "github.com/MJKWoolnough/parser"
 
 const (
 	tokenText parser.TokenType = iota
@@ -14,9 +10,9 @@ const (
 )
 
 const (
-	phraseText parser.PhraseType = iota
-	phraseOpen
-	phraseClose
+	PhraseText parser.PhraseType = iota
+	PhraseOpen
+	PhraseClose
 )
 
 const (
@@ -27,10 +23,10 @@ const (
 	attributeSep = "="
 )
 
-func newTokeniser(data string) *parser.Parser {
-	p := parser.New(parser.NewStringTokeniser(data))
+func newTokeniser(t parser.Tokeniser) *parser.Parser {
+	p := parser.New(t)
 	p.TokeniserState(text)
-	p.PhraserState(phraserText)
+	p.PhraserState(phraser)
 	return &p
 }
 
@@ -41,7 +37,7 @@ func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 		t.Get(),
 	}
 	if t.Peek() == -1 {
-		return tk, done
+		return tk, (*parser.Tokeniser).Done
 	}
 	return tk, opening
 }
@@ -105,61 +101,23 @@ func attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	}, text
 }
 
-func done(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-	return t.Done()
-}
-
-func phraserText(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
-	var next parser.PhraseFunc
-	switch p.AcceptRun(tokenText) {
-	case parser.TokenDone:
-		next = phraserDone
-	case tokenOpenTag:
-		next = phraserOpen
-	case tokenCloseTag:
-		next = phraserClose
-	default:
-		p.Err = errors.New("invalid state")
+func phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+	var phraseType parser.PhraseType
+	if p.Accept(tokenText) {
+		p.AcceptRun(tokenText)
+		phraseType = PhraseText
+	} else if p.Accept(tokenOpenTag) {
+		p.Accept(tokenTagAttribute)
+		phraseType = PhraseOpen
+	} else if p.Accept(tokenCloseTag) {
+		phraseType = PhraseClose
+	} else if p.Accept(parser.TokenDone) {
+		return p.Done()
+	} else if p.Accept(parser.TokenError) {
 		return p.Error()
 	}
-	ts := p.Get()
-	if len(ts) == 0 {
-		return next(p)
-	} else if len(ts) > 1 {
-		var l int
-		for _, t := range ts {
-			l += len(t.Data)
-		}
-		str := make([]byte, 0, l)
-		for _, t := range ts {
-			str = append(str, t.Data...)
-		}
-		ts[0].Data = string(str)
-		ts = ts[:1]
-	}
 	return parser.Phrase{
-		phraseText,
-		ts,
-	}, next
-}
-
-func phraserOpen(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
-	p.Accept(tokenOpenTag)
-	p.Accept(tokenTagAttribute)
-	return parser.Phrase{
-		phraseOpen,
-		p.Get(),
-	}, phraserText
-}
-
-func phraserClose(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
-	p.Accept(tokenCloseTag)
-	return parser.Phrase{
-		phraseOpen,
-		p.Get(),
-	}, phraserText
-}
-
-func phraserDone(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
-	return p.Done()
+		Type: phraseType,
+		Data: p.Get(),
+	}, phraser
 }

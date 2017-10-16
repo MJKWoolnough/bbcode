@@ -10,9 +10,9 @@ const (
 )
 
 const (
-	PhraseText parser.PhraseType = iota
-	PhraseOpen
-	PhraseClose
+	phraseText parser.PhraseType = iota
+	phraseOpen
+	phraseClose
 )
 
 const (
@@ -105,12 +105,12 @@ func phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	var phraseType parser.PhraseType
 	if p.Accept(tokenText) {
 		p.AcceptRun(tokenText)
-		phraseType = PhraseText
+		phraseType = phraseText
 	} else if p.Accept(tokenOpenTag) {
 		p.Accept(tokenTagAttribute)
-		phraseType = PhraseOpen
+		phraseType = phraseOpen
 	} else if p.Accept(tokenCloseTag) {
-		phraseType = PhraseClose
+		phraseType = phraseClose
 	} else if p.Accept(parser.TokenDone) {
 		return p.Done()
 	} else if p.Accept(parser.TokenError) {

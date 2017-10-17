@@ -37,7 +37,13 @@ func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 		t.Get(),
 	}
 	if t.Peek() == -1 {
+		if tk.Data == "" {
+			return t.Done()
+		}
 		return tk, (*parser.Tokeniser).Done
+	}
+	if tk.Data == "" {
+		return opening(t)
 	}
 	return tk, opening
 }

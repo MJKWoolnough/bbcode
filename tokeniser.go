@@ -55,22 +55,27 @@ func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	}
 	t.AcceptRun(validTagName)
 	var (
-		next parser.TokenFunc
+		next parser.TokenFunc = text
 		data string
 	)
 	switch t.Peek() {
 	case rune(closeTag[0]):
-		next = text
 		data = t.Get()
 		t.Accept(closeTag)
+		t.Get()
 	case rune(attributeSep[0]):
-		next = attribute
 		data = t.Get()
 		t.Accept(attributeSep)
+		if t.ExceptRun(closeTag) != rune(closeTag[0]) {
+			return parser.Token{
+				tokenText,
+				data,
+			}, text
+		}
+		next = attribute
 	default:
 		return text(t)
 	}
-	t.Get()
 	data = data[1:]
 	return parser.Token{
 		tokenOpenTag,
@@ -94,16 +99,12 @@ func closing(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 }
 
 func attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-	t.ExceptRun(closeTag)
-	if t.Peek() == -1 {
-		return text(t)
-	}
 	data := t.Get()
 	t.Accept(closeTag)
 	t.Get()
 	return parser.Token{
 		tokenTagAttribute,
-		data,
+		data[1:],
 	}, text
 }
 

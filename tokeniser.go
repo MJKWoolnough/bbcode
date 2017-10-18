@@ -23,11 +23,11 @@ const (
 	attributeSep = "="
 )
 
-func newTokeniser(t parser.Tokeniser) *parser.Parser {
+func newTokeniser(t parser.Tokeniser) parser.Parser {
 	p := parser.New(t)
 	p.TokeniserState(text)
 	p.PhraserState(phraser)
-	return &p
+	return p
 }
 
 func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
@@ -52,6 +52,9 @@ func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	t.Accept(openTag)
 	if t.Peek() == rune(closingTag[0]) {
 		return closing(t)
+	}
+	if !t.Accept(validTagName) {
+		return text(t)
 	}
 	t.AcceptRun(validTagName)
 	var (

@@ -88,6 +88,9 @@ func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 
 func closing(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	t.Accept(closingTag)
+	if !t.Accept(validTagName) {
+		return text(t)
+	}
 	t.AcceptRun(validTagName)
 	if t.Peek() == rune(closeTag[0]) {
 		data := t.Get()

@@ -12,8 +12,8 @@ Loop:
 		Input  string
 		Output []parser.Phrase
 	}{
-		{},
-		{
+		{}, // 1
+		{ // 2
 			Input: "A",
 			Output: []parser.Phrase{
 				{
@@ -27,7 +27,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 3
 			Input: "AB",
 			Output: []parser.Phrase{
 				{
@@ -41,7 +41,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 4
 			Input: "[tag][/tag]",
 			Output: []parser.Phrase{
 				{
@@ -64,7 +64,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 5
 			Input: "[tag=attr][/tag]",
 			Output: []parser.Phrase{
 				{
@@ -91,7 +91,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 6
 			Input: "ABC[img]urlHere[/img]123[url=http://www.google.com]Link Here[/url]",
 			Output: []parser.Phrase{
 				{
@@ -172,7 +172,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 7
 			Input: "PreText[NotATag[NowATag]",
 			Output: []parser.Phrase{
 				{
@@ -199,7 +199,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 8
 			Input: "PreText[NotATag=[NowATag]",
 			Output: []parser.Phrase{
 				{
@@ -226,7 +226,7 @@ Loop:
 				},
 			},
 		},
-		{
+		{ // 9
 			Input: "PreText[NotATag=[StillNotATag",
 			Output: []parser.Phrase{
 				{
@@ -243,6 +243,66 @@ Loop:
 						{
 							Type: tokenText,
 							Data: "=[StillNotATag",
+						},
+					},
+				},
+			},
+		},
+		{ // 10
+			Input: "[=123]",
+			Output: []parser.Phrase{
+				{
+					Type: phraseText,
+					Data: []parser.Token{
+						{
+							Type: tokenText,
+							Data: "[=123]",
+						},
+					},
+				},
+			},
+		},
+		{ // 11
+			Input: "[]",
+			Output: []parser.Phrase{
+				{
+					Type: phraseText,
+					Data: []parser.Token{
+						{
+							Type: tokenText,
+							Data: "[]",
+						},
+					},
+				},
+			},
+		},
+		{ // 12
+			Input: "[/]",
+			Output: []parser.Phrase{
+				{
+					Type: phraseText,
+					Data: []parser.Token{
+						{
+							Type: tokenText,
+							Data: "[/]",
+						},
+					},
+				},
+			},
+		},
+		{ // 13
+			Input: "[tag=]",
+			Output: []parser.Phrase{
+				{
+					Type: phraseOpen,
+					Data: []parser.Token{
+						{
+							Type: tokenOpenTag,
+							Data: "tag",
+						},
+						{
+							Type: tokenTagAttribute,
+							Data: "",
 						},
 					},
 				},

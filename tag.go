@@ -1,56 +1,76 @@
 package bbcode
 
+import "strings"
+
 type Handler interface {
 	Name() string
 	Handle(*Processor, string)
 }
 
-type SimpleTag struct {
-	TagName           string
-	TagOpen, TagClose []byte
+type simpleTag struct {
+	name        string
+	open, close []byte
 }
 
-func (s *SimpleTag) Name() string {
-	return s.TagName
+func Tag(name string, open, close []byte) Handler {
+	return &simpleTag{
+		name:  strings.ToLower(name),
+		open:  open,
+		close: close,
+	}
 }
 
-func (s *SimpleTag) Open(p *Processor, _ string) {
-	p.Write(s.TagOpen)
+func (s *simpleTag) Name() string {
+	return s.name
 }
 
-func (s *SimpleTag) Close(p *Processor) {
-	p.Write(s.TagClose)
+func (s *simpleTag) Open(p *Processor, _ string) {
+	p.Write(s.open)
 }
 
-func (s *SimpleTag) Handle(p *Processor, a string) {
+func (s *simpleTag) Close(p *Processor) {
+	p.Write(s.close)
+}
+
+func (s *simpleTag) Handle(p *Processor, a string) {
 	s.Open(p, a)
-	p.Process(s.TagName)
+	p.Process(s.name)
 	s.Close(p)
 }
 
-type AttributeTag struct {
-	TagName                         string
-	TagOpen, TagOpenClose, TagClose []byte
-	Filter                          func(string) []byte
+type attributeTag struct {
+	name                   string
+	open, openClose, close []byte
+	filter                 func(string) []byte
 }
 
-func (a *AttributeTag) Name() string {
-	return a.TagName
+func AttributeTag(name string, open, openClose, close []byte, filter func(string) []byte) Handler {
+	return &attributeTag{
+		name:      strings.ToLower(name),
+		open:      open,
+		openClose: openClose,
+		close:     close,
+		filter:    filter,
+	}
 }
 
-func (a *AttributeTag) Open(p *Processor, attr string) {
-	p.Write(a.TagOpen)
-	p.Write(a.Filter(attr))
-	p.Write(a.TagOpenClose)
+func (a *attributeTag) Name() string {
+	return a.name
 }
 
-func (a *AttributeTag) Close(p *Processor) {
-	p.Write(a.TagClose)
+func (a *attributeTag) Open(p *Processor, attr string) {
+	p.Write(a.open)
+	p.Write(a.filter(attr))
+	p.Write(a.openClose)
 }
 
-func (a *AttributeTag) Handle(p *Processor, attr string) {
+func (a *attributeTag) Close(p *Processor) {
+	p.Write(a.close)
+}
+
+func (a *attributeTag) Handle(p *Processor, attr string) {
 	a.Open(p, attr)
-	p.Process(a.TagName)
+	p.Process(a.name)
 	a.Close(p)
 }
 
@@ -60,14 +80,21 @@ type OpenClose interface {
 	Close(*Processor)
 }
 
-type FilterTag struct {
+type filterTag struct {
 	OpenClose
-	Filter func(string) bool
+	filter func(string) bool
 }
 
-func (f *FilterTag) Handle(p *Processor, attr string) {
+func FilterTag(o OpenClose, filter func(string) bool) Handler {
+	return &filterTag{
+		OpenClose: o,
+		filter:    filter,
+	}
+}
+
+func (f *filterTag) Handle(p *Processor, attr string) {
 	f.Open(p, attr)
-	allowText := f.Filter("")
+	allowText := f.filter("")
 	name := f.Name()
 Loop:
 	for {
@@ -77,7 +104,7 @@ Loop:
 				p.Print(t)
 			}
 		case OpenTag:
-			if f.Filter(t.Name) {
+			if f.filter(t.Name) {
 				p.ProcessTag(t)
 			} else if allowText {
 				p.Print(t)

@@ -24,18 +24,18 @@ func (s *simpleTag) Name() string {
 	return s.name
 }
 
-func (s *simpleTag) Open(p *Processor, _ string) {
+func (s *simpleTag) Open(p *Processor, attr string) {
 	p.Write(s.open)
 }
 
-func (s *simpleTag) Close(p *Processor) {
+func (s *simpleTag) Close(p *Processor, attr string) {
 	p.Write(s.close)
 }
 
-func (s *simpleTag) Handle(p *Processor, a string) {
-	s.Open(p, a)
+func (s *simpleTag) Handle(p *Processor, attr string) {
+	s.Open(p, attr)
 	p.Process(s.name)
-	s.Close(p)
+	s.Close(p, attr)
 }
 
 type attributeTag struct {
@@ -64,20 +64,20 @@ func (a *attributeTag) Open(p *Processor, attr string) {
 	p.Write(a.openClose)
 }
 
-func (a *attributeTag) Close(p *Processor) {
+func (a *attributeTag) Close(p *Processor, attr string) {
 	p.Write(a.close)
 }
 
 func (a *attributeTag) Handle(p *Processor, attr string) {
 	a.Open(p, attr)
 	p.Process(a.name)
-	a.Close(p)
+	a.Close(p, attr)
 }
 
 type OpenClose interface {
 	Name() string
 	Open(*Processor, string)
-	Close(*Processor)
+	Close(*Processor, string)
 }
 
 type filterTag struct {
@@ -120,5 +120,5 @@ Loop:
 			break Loop
 		}
 	}
-	f.Close(p)
+	f.Close(p, attr)
 }

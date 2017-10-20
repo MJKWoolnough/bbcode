@@ -1,51 +1,84 @@
 package bbcode
 
-import "strings"
+import (
+	"strings"
+	"text/template"
+)
 
+// Handler is an interface that represents the text and tag processors
 type Handler interface {
+	// Name returns the name of the bbCode tag that this will be used for.
+	// Returning an empty string indicates that this Handler should be used
+	// for text handling
 	Name() string
+	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)
 }
 
-type simpleTag struct {
+// Tag is a simple Handler that just outputs open and closing tags
+type Tag struct {
 	name        string
 	open, close []byte
 }
 
-func Tag(name string, open, close []byte) Handler {
-	return &simpleTag{
+// NewTag creates a simple Handler that outputs an open and close tag.
+// For example, the following would be used to create a tag for handling bold:
+// 	NewTag("b", []byte("<b>"), []("</b>"))
+func NewTag(name string, open, close []byte) *Tag {
+	return &Tag{
 		name:  strings.ToLower(name),
 		open:  open,
 		close: close,
 	}
 }
 
-func (s *simpleTag) Name() string {
-	return s.name
+// Name returns the name of the tag
+func (t *Tag) Name() string {
+	return t.name
 }
 
-func (s *simpleTag) Open(p *Processor, attr string) {
-	p.Write(s.open)
+// Open outputs the opening of the tag
+func (t *Tag) Open(p *Processor, attr string) {
+	p.Write(t.open)
 }
 
-func (s *simpleTag) Close(p *Processor, attr string) {
-	p.Write(s.close)
+// Close outputs the closing of the tag
+func (t *Tag) Close(p *Processor, attr string) {
+	p.Write(t.close)
 }
 
-func (s *simpleTag) Handle(p *Processor, attr string) {
-	s.Open(p, attr)
-	p.Process(s.name)
-	s.Close(p, attr)
+// Handle processes the tag
+func (t *Tag) Handle(p *Processor, attr string) {
+	t.Open(p, attr)
+	p.Process(t.name)
+	t.Close(p, attr)
 }
 
-type attributeTag struct {
+// AttributeTag is a simple Handler that outputs and open tag, with an
+// attribute, and a close tag.
+type AttributeTag struct {
 	name                   string
 	open, openClose, close []byte
 	filter                 func(string) []byte
 }
 
-func AttributeTag(name string, open, openClose, close []byte, filter func(string) []byte) Handler {
-	return &attributeTag{
+// NewAttributeTag creates a new Attribute Tag.
+// The open byte slice is output before the attribute and the openClose byte
+// slice is output after the attribute. The close byte slice is used to close
+// the tag.
+// The filter is used to modify the attribute, whether to correct formatting
+// errors, or to validate.
+// For example the following would create a colour tag for handling font colour:
+// 	NewAttributeTag("colour",
+// 		[]byte("<span style=\"color:"),
+// 		[]byte("\">"),
+// 		[]byte("</span>"),
+//		colourChecker)
+//
+// A nil filter means that the attr will be written to the output with HTML
+// encoding
+func NewAttributeTag(name string, open, openClose, close []byte, filter func(string) []byte) *AttributeTag {
+	return &AttributeTag{
 		name:      strings.ToLower(name),
 		open:      open,
 		openClose: openClose,
@@ -54,45 +87,62 @@ func AttributeTag(name string, open, openClose, close []byte, filter func(string
 	}
 }
 
-func (a *attributeTag) Name() string {
+// Name returns the name of the tag
+func (a *AttributeTag) Name() string {
 	return a.name
 }
 
-func (a *attributeTag) Open(p *Processor, attr string) {
+// Open outputs the opening of the tag
+func (a *AttributeTag) Open(p *Processor, attr string) {
 	p.Write(a.open)
-	p.Write(a.filter(attr))
+	if a.filter != nil {
+		p.Write(a.filter(attr))
+	} else {
+		template.HTMLEscape(p, []byte(attr))
+	}
 	p.Write(a.openClose)
 }
 
-func (a *attributeTag) Close(p *Processor, attr string) {
+// Close outputs the closing of the tag
+func (a *AttributeTag) Close(p *Processor, attr string) {
 	p.Write(a.close)
 }
 
-func (a *attributeTag) Handle(p *Processor, attr string) {
+// Handle processes the tag
+func (a *AttributeTag) Handle(p *Processor, attr string) {
 	a.Open(p, attr)
 	p.Process(a.name)
 	a.Close(p, attr)
 }
 
+// OpenClose is an interface for the methods required by FilterTag. Both Tag
+// and AttributeTag implement this interface
 type OpenClose interface {
 	Name() string
 	Open(*Processor, string)
 	Close(*Processor, string)
 }
 
-type filterTag struct {
+// FilterTag is a Handler that filters which child nodes are processed
+type FilterTag struct {
 	OpenClose
 	filter func(string) bool
 }
 
-func FilterTag(o OpenClose, filter func(string) bool) Handler {
-	return &filterTag{
+// NewFilterTag creates a Handler that filters which child nodes are processed.
+// The filter takes the name of the tag and returns a bool determining whether
+// the tag will be processed as a tag or as text.
+// An empty tag name in the filter is used to determine is text is processed.
+func NewFilterTag(o OpenClose, filter func(string) bool) *FilterTag {
+	return &FilterTag{
 		OpenClose: o,
 		filter:    filter,
 	}
 }
 
-func (f *filterTag) Handle(p *Processor, attr string) {
+// Handle processes the tag, using its filter to determine which children are
+// also processed
+func (f *FilterTag) Handle(p *Processor, attr string) {
 	f.Open(p, attr)
 	allowText := f.filter("")
 	name := f.Name()

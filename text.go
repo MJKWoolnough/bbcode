@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	HTMLText  htmlText  = 0
+	// HTMLText is a text processor that will HTML encode all text output
+	HTMLText htmlText = 0
+	// PlainText is a text processor that just outputs all text with no change
 	PlainText plainText = 0
 )
 

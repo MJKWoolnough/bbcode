@@ -7,6 +7,7 @@ import (
 	"github.com/MJKWoolnough/parser"
 )
 
+// Processor contains methods necessary for creating custom Handler's
 type Processor struct {
 	w      io.Writer
 	err    error
@@ -14,6 +15,8 @@ type Processor struct {
 	bbCode *BBCode
 }
 
+// Write writes to the underlying writer.
+// The error is stored and does not need to be handled
 func (p *Processor) Write(b []byte) (int, error) {
 	if p.err != nil {
 		return 0, p.err
@@ -23,6 +26,9 @@ func (p *Processor) Write(b []byte) (int, error) {
 	return n, p.err
 }
 
+// Process will continue processing the bbCode until it gets to an end tag
+// which matches the tag name given, or until it reaches the end of the input.
+// It returns true if the end tag was found, or false otherwise
 func (p *Processor) Process(untilTag string) bool {
 	for {
 		switch t := p.Get().(type) {
@@ -43,6 +49,7 @@ func (p *Processor) Process(untilTag string) bool {
 	}
 }
 
+// ProcessTag will process the given tag as normal
 func (p *Processor) ProcessTag(t OpenTag) {
 	h := p.getTagHandler(t.Name)
 	if h == nil {
@@ -65,6 +72,8 @@ func (p *Processor) getTagHandler(name string) Handler {
 	return nil
 }
 
+// Get returns the next token.
+// It will be either a Text, OpenTag or a CloseTag
 func (p *Processor) Get() interface{} {
 	phrase, _ := p.p.GetPhrase()
 	switch phrase.Type {
@@ -88,6 +97,8 @@ func (p *Processor) Get() interface{} {
 	return nil
 }
 
+// Print writes the textual representation of the given token to the output,
+// using the text Handler
 func (p *Processor) Print(t interface{}) {
 	switch t := t.(type) {
 	case Text:
@@ -122,13 +133,16 @@ func (p *Processor) printCloseTag(t CloseTag) {
 	p.bbCode.text.Handle(p, p.bbCode.tks.closeTag)
 }
 
+// Text is a token containing simple textual data
 type Text []string
 
+// OpenTag is a token containing the name of the tag and a possible attribute.
 type OpenTag struct {
 	Name string
 	Attr *string
 }
 
+// CloseTag is a token containing the name of the tag
 type CloseTag struct {
 	Name string
 }

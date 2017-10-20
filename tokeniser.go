@@ -1,6 +1,8 @@
 package bbcode
 
-import "github.com/MJKWoolnough/parser"
+import (
+	"github.com/MJKWoolnough/parser"
+)
 
 const (
 	tokenText parser.TokenType = iota
@@ -15,23 +17,33 @@ const (
 	phraseClose
 )
 
-const (
-	openTag      = "["
-	closeTag     = "]"
-	closingTag   = "/"
-	validTagName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890*"
-	attributeSep = "="
-)
+type tokeniser struct {
+	openTag, closeTag, closingTag, validTagName, attributeSep string
+	closeTagRune, closingTagRune, attributeSepRune            rune
+}
 
-func newTokeniser(t parser.Tokeniser) parser.Parser {
+func getTokeniser(c Config) tokeniser {
+	return tokeniser{
+		openTag:          string(c.TagOpen),
+		closeTag:         string(c.TagClose),
+		closingTag:       string(c.ClosingTag),
+		validTagName:     string(c.Name),
+		attributeSep:     string(c.AttributeSep),
+		closeTagRune:     c.TagClose,
+		closingTagRune:   c.ClosingTag,
+		attributeSepRune: c.AttributeSep,
+	}
+}
+
+func (tks *tokeniser) getParser(t parser.Tokeniser) parser.Parser {
 	p := parser.New(t)
-	p.TokeniserState(text)
-	p.PhraserState(phraser)
+	p.TokeniserState(tks.text)
+	p.PhraserState(tks.phraser)
 	return p
 }
 
-func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-	t.ExceptRun(openTag)
+func (tks *tokeniser) text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.ExceptRun(tks.openTag)
 	tk := parser.Token{
 		tokenText,
 		t.Get(),
@@ -43,41 +55,41 @@ func text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 		return tk, (*parser.Tokeniser).Done
 	}
 	if tk.Data == "" {
-		return opening(t)
+		return tks.opening(t)
 	}
-	return tk, opening
+	return tk, tks.opening
 }
 
-func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-	t.Accept(openTag)
-	if t.Peek() == rune(closingTag[0]) {
-		return closing(t)
+func (tks *tokeniser) opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.Accept(tks.openTag)
+	if t.Peek() == tks.closingTagRune {
+		return tks.closing(t)
 	}
-	if !t.Accept(validTagName) {
-		return text(t)
+	if !t.Accept(tks.validTagName) {
+		return tks.text(t)
 	}
-	t.AcceptRun(validTagName)
+	t.AcceptRun(tks.validTagName)
 	var (
-		next parser.TokenFunc = text
+		next parser.TokenFunc = tks.text
 		data string
 	)
 	switch t.Peek() {
-	case rune(closeTag[0]):
+	case tks.closeTagRune:
 		data = t.Get()
-		t.Accept(closeTag)
+		t.Accept(tks.closeTag)
 		t.Get()
-	case rune(attributeSep[0]):
+	case tks.attributeSepRune:
 		data = t.Get()
-		t.Accept(attributeSep)
-		if t.ExceptRun(closeTag) != rune(closeTag[0]) {
+		t.Accept(tks.attributeSep)
+		if t.ExceptRun(tks.closeTag) != tks.closeTagRune {
 			return parser.Token{
 				tokenText,
 				data,
-			}, text
+			}, tks.text
 		}
-		next = attribute
+		next = tks.attribute
 	default:
-		return text(t)
+		return tks.text(t)
 	}
 	data = data[1:]
 	return parser.Token{
@@ -86,35 +98,35 @@ func opening(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	}, next
 }
 
-func closing(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
-	t.Accept(closingTag)
-	if !t.Accept(validTagName) {
-		return text(t)
+func (tks *tokeniser) closing(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+	t.Accept(tks.closingTag)
+	if !t.Accept(tks.validTagName) {
+		return tks.text(t)
 	}
-	t.AcceptRun(validTagName)
-	if t.Peek() == rune(closeTag[0]) {
+	t.AcceptRun(tks.validTagName)
+	if t.Peek() == tks.closeTagRune {
 		data := t.Get()
-		t.Accept(closeTag)
+		t.Accept(tks.closeTag)
 		t.Get()
 		return parser.Token{
 			tokenCloseTag,
 			data[2:],
-		}, text
+		}, tks.text
 	}
-	return text(t)
+	return tks.text(t)
 }
 
-func attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
+func (tks *tokeniser) attribute(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	data := t.Get()
-	t.Accept(closeTag)
+	t.Accept(tks.closeTag)
 	t.Get()
 	return parser.Token{
 		tokenTagAttribute,
 		data[1:],
-	}, text
+	}, tks.text
 }
 
-func phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
+func (tks *tokeniser) phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	var phraseType parser.PhraseType
 	if p.Accept(tokenText) {
 		p.AcceptRun(tokenText)
@@ -132,5 +144,5 @@ func phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFunc) {
 	return parser.Phrase{
 		Type: phraseType,
 		Data: p.Get(),
-	}, phraser
+	}, tks.phraser
 }

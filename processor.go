@@ -8,11 +8,10 @@ import (
 )
 
 type Processor struct {
-	w    io.Writer
-	err  error
-	p    parser.Parser
-	text Handler
-	tags []Handler
+	w      io.Writer
+	err    error
+	p      parser.Parser
+	bbCode *BBCode
 }
 
 func (p *Processor) Write(b []byte) (int, error) {
@@ -29,7 +28,7 @@ func (p *Processor) Process(untilTag string) bool {
 		switch t := p.Get().(type) {
 		case Text:
 			for _, s := range t {
-				p.text.Handle(p, s)
+				p.bbCode.text.Handle(p, s)
 			}
 		case OpenTag:
 			p.ProcessTag(t)
@@ -58,7 +57,7 @@ func (p *Processor) ProcessTag(t OpenTag) {
 }
 
 func (p *Processor) getTagHandler(name string) Handler {
-	for _, tag := range p.tags {
+	for _, tag := range p.bbCode.tags {
 		if tag.Name() == name {
 			return tag
 		}
@@ -102,26 +101,25 @@ func (p *Processor) Print(t interface{}) {
 
 func (p *Processor) printText(t Text) {
 	for _, str := range t {
-		p.text.Handle(p, str)
+		p.bbCode.text.Handle(p, str)
 	}
 }
 
 func (p *Processor) printOpenTag(t OpenTag) {
-	p.text.Handle(p, tagBytes[:1])
-	p.text.Handle(p, t.Name)
+	p.bbCode.text.Handle(p, p.bbCode.tks.openTag)
+	p.bbCode.text.Handle(p, t.Name)
 	if t.Attr != nil {
-		p.text.Handle(p, tagBytes[2:3])
-		p.text.Handle(p, *t.Attr)
+		p.bbCode.text.Handle(p, p.bbCode.tks.attributeSep)
+		p.bbCode.text.Handle(p, *t.Attr)
 	}
-	p.text.Handle(p, tagBytes[3:])
+	p.bbCode.text.Handle(p, p.bbCode.tks.closeTag)
 }
 
-const tagBytes = "[/=]"
-
 func (p *Processor) printCloseTag(t CloseTag) {
-	p.text.Handle(p, tagBytes[:2])
-	p.text.Handle(p, t.Name)
-	p.text.Handle(p, tagBytes[3:])
+	p.bbCode.text.Handle(p, p.bbCode.tks.openTag)
+	p.bbCode.text.Handle(p, p.bbCode.tks.closingTag)
+	p.bbCode.text.Handle(p, t.Name)
+	p.bbCode.text.Handle(p, p.bbCode.tks.closeTag)
 }
 
 type Text []string

@@ -7,27 +7,26 @@ import (
 	"github.com/MJKWoolnough/parser"
 )
 
-/*
 type Config struct {
 	TagOpen, TagClose, ClosingTag, AttributeSep rune
 	Name                                        string
 }
 
-var DefaultConfig = Config{
+var defaultConfig = Config{
 	TagOpen:      '[',
 	TagClose:     ']',
 	ClosingTag:   '/',
 	AttributeSep: '=',
 	Name:         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*",
 }
-*/
+
 type BBCode struct {
-	//config Config
+	tks  tokeniser
 	text Handler
 	tags []Handler
 }
 
-func New( /*c Config,*/ tags ...Handler) *BBCode {
+func NewWithConfig(c Config, tags ...Handler) *BBCode {
 	var text Handler = PlainText
 	for _, tag := range tags {
 		if tag.Name() == "" {
@@ -36,10 +35,14 @@ func New( /*c Config,*/ tags ...Handler) *BBCode {
 		}
 	}
 	return &BBCode{
-		//config: c,
+		tks:  getTokeniser(c),
 		text: text,
 		tags: tags,
 	}
+}
+
+func New(tags ...Handler) *BBCode {
+	return NewWithConfig(defaultConfig, tags...)
 }
 
 func (b *BBCode) Convert(w io.Writer, input []byte) error {
@@ -56,10 +59,9 @@ func (b *BBCode) ConvertReader(w io.Writer, input io.Reader) error {
 
 func (b *BBCode) convert(w io.Writer, t parser.Tokeniser) error {
 	p := Processor{
-		w:    w,
-		p:    newTokeniser(t),
-		text: b.text,
-		tags: b.tags,
+		w:      w,
+		p:      b.tks.getParser(t),
+		bbCode: b,
 	}
 	p.Process("")
 	return p.err

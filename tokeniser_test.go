@@ -7,6 +7,7 @@ import (
 )
 
 func TestTokeniser(t *testing.T) {
+	tks := getTokeniser(defaultConfig)
 Loop:
 	for n, test := range [...]struct {
 		Input  string
@@ -309,7 +310,7 @@ Loop:
 			},
 		},
 	} {
-		tk := newTokeniser(parser.NewStringTokeniser(test.Input))
+		tk := tks.getParser(parser.NewStringTokeniser(test.Input))
 		for m, phrase := range test.Output {
 			p, err := tk.GetPhrase()
 			if err != nil {

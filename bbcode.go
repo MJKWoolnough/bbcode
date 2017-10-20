@@ -8,8 +8,11 @@ import (
 )
 
 type Config struct {
-	TagOpen, TagClose, ClosingTag, AttributeSep rune
-	Name                                        string
+	TagOpen      rune
+	TagClose     rune
+	ClosingTag   rune
+	AttributeSep rune
+	ValidTagName string
 }
 
 var defaultConfig = Config{
@@ -17,7 +20,7 @@ var defaultConfig = Config{
 	TagClose:     ']',
 	ClosingTag:   '/',
 	AttributeSep: '=',
-	Name:         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*",
+	ValidTagName: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*",
 }
 
 type BBCode struct {

@@ -7,13 +7,20 @@ Package bbcode implements a bbcode parser and converter
 ## Usage
 
 ```go
-const (
+var (
 	// HTMLText is a text processor that will HTML encode all text output
-	HTMLText htmlText = 0
+	HTMLText htmlText
 	// PlainText is a text processor that just outputs all text with no change
-	PlainText plainText = 0
+	PlainText plainText
 )
 ```
+
+#### func  Compare
+
+```go
+func Compare(a, b string) bool
+```
+Compare preforms a case-insensitive string comparison
 
 #### type AttributeTag
 
@@ -28,17 +35,21 @@ and a close tag.
 #### func  NewAttributeTag
 
 ```go
-func NewAttributeTag(name string, open, openClose, close []byte, filter func(string) []byte) *AttributeTag
+func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter func(string) []byte) *AttributeTag
 ```
-NewAttributeTag creates a new Attribute Tag. The open byte slice is output
-before the attribute and the openClose byte slice is output after the attribute.
-The close byte slice is used to close the tag. The filter is used to modify the
-attribute, whether to correct formatting errors, or to validate. For example the
-following would create a colour tag for handling font colour:
+NewAttributeTag creates a new Attribute Tag. The open byte slice is used to
+start the open tag and the openClose is used to close the open tag. The attrOpen
+and attrClose byte slices are used to surround the filtered attribute, within
+the open tag. Lastly, the close byte slice is used for the closing tag. The
+filter is used to modify the attribute, whether to correct formatting errors, or
+to validate. If a nil slice is returned, then no attribute is outputted. For
+example the following would create a colour tag for handling font colour:
 
     NewAttributeTag("colour",
-    	[]byte("<span style=\"color:"),
-    	[]byte("\">"),
+    	[]byte("<span"),
+    	[]byte(">"),
+    	[]byte(" style=\"color: "),
+    	[]byte("\""),
     	[]byte("</span>"),
     	colourChecker)
 

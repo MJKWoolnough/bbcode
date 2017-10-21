@@ -5,14 +5,14 @@ import (
 	"text/template"
 )
 
-const (
+var (
 	// HTMLText is a text processor that will HTML encode all text output
-	HTMLText htmlText = 0
+	HTMLText htmlText
 	// PlainText is a text processor that just outputs all text with no change
-	PlainText plainText = 0
+	PlainText plainText
 )
 
-type htmlText int
+type htmlText struct{}
 
 var (
 	newLine     = []byte{'\n'}
@@ -32,7 +32,7 @@ func (htmlText) Handle(p *Processor, text string) {
 	}
 }
 
-type plainText int
+type plainText struct{}
 
 func (plainText) Name() string {
 	return ""

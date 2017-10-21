@@ -3,6 +3,8 @@ package bbcode
 import (
 	"strings"
 	"text/template"
+
+	"github.com/MJKWoolnough/memio"
 )
 
 // Handler is an interface that represents the text and tag processors
@@ -58,31 +60,38 @@ func (t *Tag) Handle(p *Processor, attr string) {
 // AttributeTag is a simple Handler that outputs and open tag, with an
 // attribute, and a close tag.
 type AttributeTag struct {
-	name                   string
-	open, openClose, close []byte
-	filter                 func(string) []byte
+	name                                        string
+	open, openClose, attrOpen, attrClose, close []byte
+	filter                                      func(string) []byte
 }
 
 // NewAttributeTag creates a new Attribute Tag.
-// The open byte slice is output before the attribute and the openClose byte
-// slice is output after the attribute. The close byte slice is used to close
-// the tag.
+// The open byte slice is used to start the open tag and the openClose is used
+// to close the open tag.
+// The attrOpen and attrClose byte slices are used to surround the filtered
+// attribute, within the open tag.
+// Lastly, the close byte slice is used for the closing tag.
 // The filter is used to modify the attribute, whether to correct formatting
-// errors, or to validate.
+// errors, or to validate. If a nil slice is returned, then no attribute is
+// outputted.
 // For example the following would create a colour tag for handling font colour:
 // 	NewAttributeTag("colour",
-// 		[]byte("<span style=\"color:"),
-// 		[]byte("\">"),
+// 		[]byte("<span"),
+// 		[]byte(">"),
+// 		[]byte(" style=\"color: "),
+// 		[]byte("\""),
 // 		[]byte("</span>"),
 //		colourChecker)
 //
 // A nil filter means that the attr will be written to the output with HTML
 // encoding
-func NewAttributeTag(name string, open, openClose, close []byte, filter func(string) []byte) *AttributeTag {
+func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter func(string) []byte) *AttributeTag {
 	return &AttributeTag{
 		name:      strings.ToLower(name),
 		open:      open,
 		openClose: openClose,
+		attrOpen:  attrOpen,
+		attrClose: attrClose,
 		close:     close,
 		filter:    filter,
 	}
@@ -96,10 +105,22 @@ func (a *AttributeTag) Name() string {
 // Open outputs the opening of the tag
 func (a *AttributeTag) Open(p *Processor, attr string) {
 	p.Write(a.open)
+	var filtered []byte
 	if a.filter != nil {
-		p.Write(a.filter(attr))
-	} else {
-		template.HTMLEscape(p, []byte(attr))
+		filtered = a.filter(attr)
+	} else if attr != "" {
+		if !strings.ContainsAny(attr, "'\"&<>\000") {
+			filtered = []byte(attr)
+		} else {
+			var b memio.Buffer
+			template.HTMLEscape(&b, []byte(attr))
+			filtered = b
+		}
+	}
+	if filtered != nil {
+		p.Write(a.attrOpen)
+		p.Write(filtered)
+		p.Write(a.attrClose)
 	}
 	p.Write(a.openClose)
 }

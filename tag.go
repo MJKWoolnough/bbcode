@@ -9,7 +9,8 @@ import (
 type Handler interface {
 	// Name returns the name of the bbCode tag that this will be used for.
 	// Returning an empty string indicates that this Handler should be used
-	// for text handling
+	// for text handling.
+	// Name should always be returned as lowercase.
 	Name() string
 	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)

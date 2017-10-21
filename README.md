@@ -198,7 +198,8 @@ processed
 type Handler interface {
 	// Name returns the name of the bbCode tag that this will be used for.
 	// Returning an empty string indicates that this Handler should be used
-	// for text handling
+	// for text handling.
+	// Name should always be returned as lowercase.
 	Name() string
 	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)
@@ -247,6 +248,13 @@ func (p *Processor) Get() interface{}
 ```
 Get returns the next token. It will be either a Text, OpenTag or a CloseTag
 
+#### func (*Processor) GetContents
+
+```go
+func (p *Processor) GetContents(untilTag string) string
+```
+GetContents grabs the raw contents of a tag and returns it as a string
+
 #### func (*Processor) Print
 
 ```go
@@ -262,7 +270,8 @@ func (p *Processor) Process(untilTag string) bool
 ```
 Process will continue processing the bbCode until it gets to an end tag which
 matches the tag name given, or until it reaches the end of the input. It returns
-true if the end tag was found, or false otherwise
+true if the end tag was found, or false otherwise. The untilTag must always be
+lowercase.
 
 #### func (*Processor) ProcessTag
 

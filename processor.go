@@ -4,6 +4,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/parser"
 )
 
@@ -28,18 +29,17 @@ func (p *Processor) Write(b []byte) (int, error) {
 
 // Process will continue processing the bbCode until it gets to an end tag
 // which matches the tag name given, or until it reaches the end of the input.
-// It returns true if the end tag was found, or false otherwise
+// It returns true if the end tag was found, or false otherwise.
+// The untilTag must always be lowercase.
 func (p *Processor) Process(untilTag string) bool {
 	for {
 		switch t := p.Get().(type) {
 		case Text:
-			for _, s := range t {
-				p.bbCode.text.Handle(p, s)
-			}
+			p.printText(t)
 		case OpenTag:
 			p.ProcessTag(t)
 		case CloseTag:
-			if strings.ToLower(t.Name) == untilTag {
+			if t.Name == untilTag {
 				return true
 			}
 			p.printCloseTag(t)
@@ -47,6 +47,34 @@ func (p *Processor) Process(untilTag string) bool {
 			return false
 		}
 	}
+}
+
+// GetContents grabs the raw contents of a tag and returns it as a string
+func (p *Processor) GetContents(untilTag string) string {
+	if p.err != nil {
+		return false
+	}
+	w := p.w
+	b := make(memio.Buffer, 0, 1024)
+	p.w = &b
+Loop:
+	for {
+		switch t := p.Get().(type) {
+		case Text:
+			p.printText(t)
+		case OpenTag:
+			p.printOpenTag(t)
+		case CloseTag:
+			if t.Name == untilTag {
+				break Loop
+			}
+			p.printCloseTag(t)
+		default:
+			break Loop
+		}
+	}
+	p.w = w
+	return string(b)
 }
 
 // ProcessTag will process the given tag as normal
@@ -85,14 +113,14 @@ func (p *Processor) Get() interface{} {
 		return text
 	case phraseOpen:
 		tag := OpenTag{
-			Name: phrase.Data[0].Data,
+			Name: strings.ToLower(phrase.Data[0].Data),
 		}
 		if len(phrase.Data) > 1 {
 			tag.Attr = &phrase.Data[1].Data
 		}
 		return tag
 	case phraseClose:
-		return CloseTag{Name: phrase.Data[0].Data}
+		return CloseTag{Name: strings.ToLower(phrase.Data[0].Data)}
 	}
 	return nil
 }

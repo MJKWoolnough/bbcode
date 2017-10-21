@@ -52,7 +52,7 @@ func (p *Processor) Process(untilTag string) bool {
 // GetContents grabs the raw contents of a tag and returns it as a string
 func (p *Processor) GetContents(untilTag string) string {
 	if p.err != nil {
-		return false
+		return ""
 	}
 	w := p.w
 	b := make(memio.Buffer, 0, 1024)

@@ -129,6 +129,8 @@ func (p *Processor) Get() interface{} {
 // using the text Handler
 func (p *Processor) Print(t interface{}) {
 	switch t := t.(type) {
+	case string:
+		p.bbCode.text.Handle(p, t)
 	case Text:
 		p.printText(t)
 	case OpenTag:

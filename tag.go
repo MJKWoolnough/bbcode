@@ -57,12 +57,43 @@ func (t *Tag) Handle(p *Processor, attr string) {
 	t.Close(p, attr)
 }
 
+// AttrFilterer is used with AttributeTag to provide an attribute filter for
+// the AttributeTag. It is used to process the parsed attribute for writing.
+type AttrFilterer interface {
+	AttrFilter(string) []byte
+}
+
+var defaultAttrFilter attrFilter
+
+type attrFilter struct{}
+
+func (attrFilter) AttrFilter(attr string) []byte {
+	if attr != "" {
+		if !strings.ContainsAny(attr, "'\"&<>\000") {
+			return []byte(attr)
+		}
+		var b memio.Buffer
+		template.HTMLEscape(&b, []byte(attr))
+		return b
+	}
+	return nil
+}
+
+// AttrFilterFunc is a wrapper for a func so that it satisfies the AttrFilterer
+// interface
+type AttrFilterFunc func(string) []byte
+
+// AttrFilter satisfies the AttrFilterer interface
+func (a AttrFilterFunc) AttrFilter(attr string) []byte {
+	return a(attr)
+}
+
 // AttributeTag is a simple Handler that outputs and open tag, with an
 // attribute, and a close tag.
 type AttributeTag struct {
 	name                                        string
 	open, openClose, attrOpen, attrClose, close []byte
-	filter                                      func(string) []byte
+	filter                                      AttrFilterer
 }
 
 // NewAttributeTag creates a new Attribute Tag.
@@ -85,7 +116,10 @@ type AttributeTag struct {
 //
 // A nil filter means that the attr will be written to the output with HTML
 // encoding
-func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter func(string) []byte) *AttributeTag {
+func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter AttrFilterer) *AttributeTag {
+	if filter == nil {
+		filter = &defaultAttrFilter
+	}
 	return &AttributeTag{
 		name:      strings.ToLower(name),
 		open:      open,
@@ -105,19 +139,7 @@ func (a *AttributeTag) Name() string {
 // Open outputs the opening of the tag
 func (a *AttributeTag) Open(p *Processor, attr string) {
 	p.Write(a.open)
-	var filtered []byte
-	if a.filter != nil {
-		filtered = a.filter(attr)
-	} else if attr != "" {
-		if !strings.ContainsAny(attr, "'\"&<>\000") {
-			filtered = []byte(attr)
-		} else {
-			var b memio.Buffer
-			template.HTMLEscape(&b, []byte(attr))
-			filtered = b
-		}
-	}
-	if filtered != nil {
+	if filtered := a.filter.AttrFilter(attr); filtered != nil {
 		p.Write(a.attrOpen)
 		p.Write(filtered)
 		p.Write(a.attrClose)

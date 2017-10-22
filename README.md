@@ -22,6 +22,33 @@ func Compare(a, b string) bool
 ```
 Compare preforms a case-insensitive string comparison
 
+#### type AttrFilterFunc
+
+```go
+type AttrFilterFunc func(string) []byte
+```
+
+AttrFilterFunc is a wrapper for a func so that it satisfies the AttrFilterer
+interface
+
+#### func (AttrFilterFunc) AttrFilter
+
+```go
+func (a AttrFilterFunc) AttrFilter(attr string) []byte
+```
+AttrFilter satisfies the AttrFilterer interface
+
+#### type AttrFilterer
+
+```go
+type AttrFilterer interface {
+	AttrFilter(string) []byte
+}
+```
+
+AttrFilterer is used with AttributeTag to provide an attribute filter for the
+AttributeTag. It is used to process the parsed attribute for writing.
+
 #### type AttributeTag
 
 ```go
@@ -35,7 +62,7 @@ and a close tag.
 #### func  NewAttributeTag
 
 ```go
-func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter func(string) []byte) *AttributeTag
+func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter AttrFilterer) *AttributeTag
 ```
 NewAttributeTag creates a new Attribute Tag. The open byte slice is used to
 start the open tag and the openClose is used to close the open tag. The attrOpen

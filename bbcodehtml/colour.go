@@ -161,7 +161,7 @@ func hexFunc(r rune) bool {
 	return (r < '0' || r > '9') && (r < 'A' || r > 'F') && (r < 'a' || r > 'f')
 }
 
-func (c colours) Filter(attr string) []byte {
+func (c colours) AttrFilter(attr string) []byte {
 	var hex []byte
 	if len(attr) > 0 {
 		var ok bool

@@ -39,7 +39,7 @@ var (
 )
 
 var (
-	Align = bbcode.NewAttributeTag("align", divPartialOpen, tagClose, alignAttr, attrClose, divClose, alignFilter)
+	Align = bbcode.NewAttributeTag("align", divPartialOpen, tagClose, alignAttr, attrClose, divClose, bbcode.AttrFilterFunc(alignFilter))
 
 	LeftAlign   = bbcode.NewTag("left", leftOpen, divClose)
 	CentreAlign = bbcode.NewTag("centre", centreOpen, divClose)
@@ -47,17 +47,17 @@ var (
 	RightAlign  = bbcode.NewTag("right", rightOpen, divClose)
 	FullAlign   = bbcode.NewTag("full", fullOpen, divClose)
 
-	Color  = bbcode.NewAttributeTag("color", spanPartialOpen, tagClose, colourAttr, attrClose, spanClose, Colours.Filter)
-	Colour = bbcode.NewAttributeTag("colour", spanPartialOpen, tagClose, colourAttr, attrClose, spanClose, Colours.Filter)
+	Color  = bbcode.NewAttributeTag("color", spanPartialOpen, tagClose, colourAttr, attrClose, spanClose, Colours)
+	Colour = bbcode.NewAttributeTag("colour", spanPartialOpen, tagClose, colourAttr, attrClose, spanClose, Colours)
 
-	Font = bbcode.NewAttributeTag("font", spanPartialOpen, tagClose, fontAttr, attrClose, spanClose, Fonts.Filter)
+	Font = bbcode.NewAttributeTag("font", spanPartialOpen, tagClose, fontAttr, attrClose, spanClose, Fonts)
 
 	Bold         = bbcode.NewTag("b", []byte("<b>"), []byte("</b>"))
 	Italic       = bbcode.NewTag("i", []byte("<i>"), []byte("</i>"))
 	Strikethough = bbcode.NewTag("s", []byte("<s>"), []byte("</s>"))
 	Underline    = bbcode.NewTag("u", []byte("<u>"), []byte("</u>"))
 
-	Size = bbcode.NewAttributeTag("size", spanPartialOpen, tagClose, sizeAttr, sizeClose, spanClose, sizeFilter)
+	Size = bbcode.NewAttributeTag("size", spanPartialOpen, tagClose, sizeAttr, sizeClose, spanClose, bbcode.AttrFilterFunc(sizeFilter))
 
 	Heading1 = bbcode.NewTag("h1", []byte("<h1>"), []byte("</h1>"))
 	Heading2 = bbcode.NewTag("h2", []byte("<h2>"), []byte("</h2>"))
@@ -67,7 +67,7 @@ var (
 	Heading6 = bbcode.NewTag("h6", []byte("<h6>"), []byte("</h6>"))
 	Heading7 = bbcode.NewTag("h7", []byte("<h7>"), []byte("</h7>"))
 
-	Quote = bbcode.AttributeTag("quote", []byte("<fieldset class=\"quote\">"), []byte("<blockquote>"), []byte("<legend>"), []byte("</legend>"), []byte("</blockquote></fieldset>"), notEmptyFilter)
+	Quote = bbcode.NewAttributeTag("quote", []byte("<fieldset class=\"quote\">"), []byte("<blockquote>"), []byte("<legend>"), []byte("</legend>"), []byte("</blockquote></fieldset>"), bbcode.AttrFilterFunc(notEmptyFilter))
 
 	Code code
 	// Image img  // TODO

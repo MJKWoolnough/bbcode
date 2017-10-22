@@ -18,7 +18,7 @@ var Fonts = fonts{
 
 type fonts map[string][]byte
 
-func (f fonts) Filter(attr string) []byte {
+func (f fonts) AttrFilter(attr string) []byte {
 	if font, ok := f[strings.ToLower(attr)]; ok {
 		return font
 	}

@@ -69,11 +69,11 @@ var (
 
 	Quote = bbcode.NewAttributeTag("quote", []byte("<fieldset class=\"quote\">"), []byte("<blockquote>"), []byte("<legend>"), []byte("</legend>"), []byte("</blockquote></fieldset>"), bbcode.AttrFilterFunc(notEmptyFilter))
 
-	Code code
-	// Image img  // TODO
+	Code  code
+	Image img
 	// List  list // TODO
 	Table table
-	// URL   url  // TODO
+	URL   urlT
 )
 
 func alignFilter(attr string) []byte {

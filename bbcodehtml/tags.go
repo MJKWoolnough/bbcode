@@ -21,16 +21,17 @@ var (
 	fullOpen   = []byte("<div style=\"text-align: justify\">")
 
 	divOpen        = []byte("<div>")
-	divPartialOpen = []byte("<div")
+	divPartialOpen = divOpen[:4]
 	divClose       = []byte("</div>")
 
 	spanOpen        = []byte("<span>")
-	spanPartialOpen = []byte("<span")
+	spanPartialOpen = spanOpen[:5]
 	spanClose       = []byte("</span>")
 
-	tagClose  = []byte(">")
-	attrClose = []byte("\"")
-	sizeClose = []byte("pt\"")
+	attrTagClose = []byte("\">")
+	tagClose     = attrTagClose[:1]
+	attrClose    = attrTagClose[1:]
+	sizeClose    = []byte("pt\"")
 
 	alignAttr  = []byte(" style=\"text-align: ")
 	colourAttr = []byte(" style=\"color: ")

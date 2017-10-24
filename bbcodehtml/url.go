@@ -23,8 +23,7 @@ func (urlT) Handle(p *bbcode.Processor, attr string) {
 		if err == nil {
 			p.Write(urlOpen)
 			p.Write([]byte(u.String()))
-			p.Write(attrClose)
-			p.Write(tagClose)
+			p.Write(attrTagClose)
 			p.Process("url")
 			p.Write(urlClose)
 		} else {
@@ -36,8 +35,7 @@ func (urlT) Handle(p *bbcode.Processor, attr string) {
 		if err == nil {
 			p.Write(urlOpen)
 			p.Write([]byte(u.String()))
-			p.Write(attrClose)
-			p.Write(tagClose)
+			p.Write(attrTagClose)
 			p.Print(utxt)
 			p.Write(urlClose)
 		} else {

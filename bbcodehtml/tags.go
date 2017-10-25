@@ -74,7 +74,7 @@ var (
 	Image img
 	// List  list // TODO
 	Table table
-	URL   urlT
+	URL   url
 )
 
 func alignFilter(attr string) []byte {

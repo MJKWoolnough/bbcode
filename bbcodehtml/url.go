@@ -1,7 +1,7 @@
 package bbcodehtml
 
 import (
-	"net/url"
+	nurl "net/url"
 
 	"github.com/MJKWoolnough/bbcode"
 )
@@ -11,15 +11,15 @@ var (
 	urlClose = []byte("</a>")
 )
 
-type urlT struct{}
+type url struct{}
 
-func (urlT) Name() string {
+func (url) Name() string {
 	return "url"
 }
 
-func (urlT) Handle(p *bbcode.Processor, attr string) {
+func (url) Handle(p *bbcode.Processor, attr string) {
 	if attr != "" {
-		u, err := url.Parse(attr)
+		u, err := nurl.Parse(attr)
 		if err == nil {
 			p.Write(urlOpen)
 			p.Write([]byte(u.String()))
@@ -31,7 +31,7 @@ func (urlT) Handle(p *bbcode.Processor, attr string) {
 		}
 	} else {
 		utxt := p.GetContents("url")
-		u, err := url.Parse(attr)
+		u, err := nurl.Parse(attr)
 		if err == nil {
 			p.Write(urlOpen)
 			p.Write([]byte(u.String()))

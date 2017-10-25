@@ -2,7 +2,7 @@ package bbcodehtml
 
 import (
 	"html/template"
-	"net/url"
+	nurl "net/url"
 	"strings"
 
 	"github.com/MJKWoolnough/bbcode"
@@ -23,7 +23,7 @@ func (img) Name() string {
 }
 
 func (img) Handle(p *bbcode.Processor, attr string) {
-	if u, err := url.Parse(p.GetContents("img")); err == nil {
+	if u, err := nurl.Parse(p.GetContents("img")); err == nil {
 		switch strings.ToLower(u.Scheme) {
 		case "http", "https":
 			p.Write(imgOpen)
@@ -35,7 +35,7 @@ func (img) Handle(p *bbcode.Processor, attr string) {
 				p.Write(attrClose)
 			}
 			p.Write(srcOpen)
-			p.Write([]byte(url.QueryEscape(u.String())))
+			p.Write([]byte(nurl.QueryEscape(u.String())))
 			p.Write(imgClose)
 		}
 	}

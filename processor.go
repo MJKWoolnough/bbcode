@@ -57,6 +57,8 @@ func (p *Processor) GetContents(untilTag string) string {
 	w := p.w
 	b := make(memio.Buffer, 0, 1024)
 	p.w = &b
+	t := p.bbCode.text
+	p.bbCode.text = PlainText
 Loop:
 	for {
 		switch t := p.Get().(type) {
@@ -73,6 +75,7 @@ Loop:
 			break Loop
 		}
 	}
+	p.bbCode.text = t
 	p.w = w
 	return string(b)
 }

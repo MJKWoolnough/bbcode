@@ -72,7 +72,7 @@ var (
 
 	Code  code
 	Image img
-	// List  list // TODO
+	List  list
 	Table table
 	URL   url
 )

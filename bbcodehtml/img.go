@@ -1,6 +1,7 @@
 package bbcodehtml
 
 import (
+	"fmt"
 	"html/template"
 	nurl "net/url"
 	"strings"
@@ -10,10 +11,8 @@ import (
 )
 
 var (
-	imgOpen  = []byte("<img")
-	altOpen  = []byte(" alt=\"")
-	srcOpen  = []byte(" src=\"")
-	imgClose = []byte("\" />")
+	imgOpen = []byte("<img")
+	altOpen = []byte(" alt=\"")
 )
 
 type img struct{}
@@ -34,9 +33,7 @@ func (img) Handle(p *bbcode.Processor, attr string) {
 				p.Write(b)
 				p.Write(attrClose)
 			}
-			p.Write(srcOpen)
-			p.Write([]byte(nurl.QueryEscape(u.String())))
-			p.Write(imgClose)
+			fmt.Fprintf(p, " src=%q />", u)
 		}
 	}
 }

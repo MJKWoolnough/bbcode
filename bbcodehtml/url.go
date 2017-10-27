@@ -22,7 +22,7 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 	if attr != "" {
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			fmt.Fprint(p, "<a href=%q>", u)
+			fmt.Fprintf(p, "<a href=%q>", u)
 			p.Process("url")
 			p.Write(urlClose)
 		} else {
@@ -32,7 +32,7 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 		utxt := p.GetContents("url")
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			fmt.Fprint(p, "<a href=%q>", u)
+			fmt.Fprintf(p, "<a href=%q>", u)
 			p.Print(utxt)
 			p.Write(urlClose)
 		} else {

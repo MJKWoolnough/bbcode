@@ -29,14 +29,14 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 			p.Process("url")
 		}
 	} else {
-		utxt := p.GetContents("url")
+		attr = p.GetContents("url")
 		u, err := nurl.Parse(attr)
 		if err == nil {
 			fmt.Fprintf(p, "<a href=%q>", u)
-			p.Print(utxt)
+			p.Print(attr)
 			p.Write(urlClose)
 		} else {
-			p.Print(utxt)
+			p.Print(attr)
 		}
 	}
 }

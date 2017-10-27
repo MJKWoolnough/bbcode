@@ -1,6 +1,7 @@
 package bbcodehtml
 
 import (
+	"fmt"
 	nurl "net/url"
 
 	"github.com/MJKWoolnough/bbcode"
@@ -21,9 +22,7 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 	if attr != "" {
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			p.Write(urlOpen)
-			p.Write([]byte(u.String()))
-			p.Write(attrTagClose)
+			fmt.Fprint(p, "<a href=%q>", u)
 			p.Process("url")
 			p.Write(urlClose)
 		} else {
@@ -33,9 +32,7 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 		utxt := p.GetContents("url")
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			p.Write(urlOpen)
-			p.Write([]byte(u.String()))
-			p.Write(attrTagClose)
+			fmt.Fprint(p, "<a href=%q>", u)
 			p.Print(utxt)
 			p.Write(urlClose)
 		} else {

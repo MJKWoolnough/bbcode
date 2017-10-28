@@ -106,6 +106,9 @@ func handleLi(p *bbcode.Processor) bool {
 			default:
 				p.Print(t)
 			}
+		default:
+			p.Write(liClose)
+			return true
 		}
 	}
 }

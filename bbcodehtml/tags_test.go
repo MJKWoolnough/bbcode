@@ -1,6 +1,7 @@
 package bbcodehtml
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/MJKWoolnough/bbcode"
@@ -23,6 +24,20 @@ func testTag(t *testing.T, tests []inout, types ...bbcode.Handler) {
 		}
 		if res := string(buf); res != test.Output {
 			t.Errorf("test %d: expecting %q, got %q", n+1, test.Output, res)
+		}
+	}
+}
+
+type attrinout struct {
+	Input  string
+	Output []byte
+}
+
+func testAttr(t *testing.T, tests []attrinout) {
+	t.Parallel()
+	for n, test := range tests {
+		if output := Colours.AttrFilter(test.Input); !bytes.Equal(test.Output, output) {
+			t.Errorf("test %d: expecting %s, got %s", n+1, test.Output, output)
 		}
 	}
 }

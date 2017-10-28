@@ -117,6 +117,7 @@ func handleLiText(p *bbcode.Processor, s interface{}) {
 	var (
 		start       = true
 		lastNewLine [2]int
+		firstDone   bool
 	)
 Loop:
 	for {
@@ -130,10 +131,16 @@ Loop:
 						start = true
 					} else if start {
 						if c == '*' {
-							p.Print(t[:lastNewLine[0]])
+							if firstDone {
+								p.Print(t[:lastNewLine[0]])
+								p.Print(text[:lastNewLine[1]])
+								p.Write(liClose)
+								p.Write(liOpen)
+							} else {
+								firstDone = true
+							}
 							t = t[lastNewLine[0]:]
-							p.Print(t[0][:lastNewLine[1]])
-							t[0] = t[0][:lastNewLine[1]+1]
+							t[0] = t[0][n+1:]
 							s = t
 							start = false
 							continue Loop

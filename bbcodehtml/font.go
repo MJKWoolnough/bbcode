@@ -11,6 +11,7 @@ var (
 	arialBlack = []byte("\\\"Arial Black\\\", Gadget, sans-serif")
 	comicSans  = []byte("\\\"Comic Sans MS\\\", cursive, sans-serif")
 	impact     = []byte("Impact, Charcoal, sans-serif")
+	verdana    = []byte("Verdana, Geneva, sans-serif")
 	courier    = []byte("\\\"Courier New\\\", Courier, monospace")
 	lucida     = []byte("\\\"Lucida Console\\\", Monaco, monospace")
 	sansSerif  = impact[18:]

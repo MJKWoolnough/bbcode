@@ -69,7 +69,7 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 					}
 				}
 			case bbcode.CloseTag:
-				if t.Name == "list" {
+				if bbcode.Compare(t.Name, "list") {
 					break Loop
 				}
 			default:
@@ -96,16 +96,14 @@ func handleLi(p *bbcode.Processor) bool {
 				p.ProcessTag(t)
 			}
 		case bbcode.CloseTag:
-			switch strings.ToLower(t.Name) {
-			case "*":
+			if t.Name == "*" {
 				p.Write(liClose)
 				return false
-			case "list":
+			} else if bbcode.Compare(t.Name, "list") {
 				p.Write(liClose)
 				return true
-			default:
-				p.Print(t)
 			}
+			p.Print(t)
 		default:
 			p.Write(liClose)
 			return true
@@ -154,7 +152,7 @@ Loop:
 		case bbcode.OpenTag:
 			p.ProcessTag(t)
 		case bbcode.CloseTag:
-			if strings.ToLower(t.Name) == "list" {
+			if bbcode.Compare(t.Name, "list") {
 				return
 			}
 			p.Print(t)

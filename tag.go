@@ -12,7 +12,6 @@ type Handler interface {
 	// Name returns the name of the bbCode tag that this will be used for.
 	// Returning an empty string indicates that this Handler should be used
 	// for text handling.
-	// Name should always be returned as lowercase.
 	Name() string
 	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)
@@ -29,7 +28,7 @@ type Tag struct {
 // 	NewTag("b", []byte("<b>"), []("</b>"))
 func NewTag(name string, open, close []byte) *Tag {
 	return &Tag{
-		name:  strings.ToLower(name),
+		name:  name,
 		open:  open,
 		close: close,
 	}
@@ -121,7 +120,7 @@ func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []
 		filter = &defaultAttrFilter
 	}
 	return &AttributeTag{
-		name:      strings.ToLower(name),
+		name:      name,
 		open:      open,
 		openClose: openClose,
 		attrOpen:  attrOpen,
@@ -204,7 +203,7 @@ Loop:
 				p.Print(t)
 			}
 		case CloseTag:
-			if t.Name == name {
+			if Compare(t.Name, name) {
 				break Loop
 			}
 			if allowText {

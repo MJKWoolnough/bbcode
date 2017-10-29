@@ -36,28 +36,27 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			switch t.Name {
-			case "thead":
+			if bbcode.Compare(t.Name, "thead") {
 				if !thead {
 					p.Write(tableHeadOpen)
 					tableIHandle(p, "thead")
 					p.Write(tableHeadClose)
 					thead = true
 				}
-			case "tfoot":
+			} else if bbcode.Compare(t.Name, "tfoot") {
 				if !tfoot {
 					p.Write(tableFootOpen)
 					tableIHandle(p, "tfoot")
 					p.Write(tableFootClose)
 					tfoot = true
 				}
-			case "row", "tr":
+			} else if bbcode.Compare(t.Name, "row") || bbcode.Compare(t.Name, "tr") {
 				p.Write(trOpen)
 				tableRow(p, t.Name)
 				p.Write(trClose)
 			}
 		case bbcode.CloseTag:
-			if t.Name == "table" {
+			if bbcode.Compare(t.Name, "table") {
 				break Loop
 			}
 		default:
@@ -72,8 +71,7 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			switch t.Name {
-			case "row", "tr":
+			if bbcode.Compare(t.Name, "row") || bbcode.Compare(t.Name, "tr") {
 				p.Write(trOpen)
 				tableRow(p, t.Name)
 				p.Write(trClose)
@@ -94,12 +92,11 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			switch t.Name {
-			case "col", "td":
+			if bbcode.Compare(t.Name, "col") || bbcode.Compare(t.Name, "td") {
 				p.Write(tdOpen)
 				p.Process(t.Name)
 				p.Write(tdClose)
-			case "th":
+			} else if bbcode.Compare(t.Name, "th") {
 				p.Write(thOpen)
 				p.Process(t.Name)
 				p.Write(thClose)

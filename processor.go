@@ -2,7 +2,6 @@ package bbcode
 
 import (
 	"io"
-	"strings"
 
 	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/parser"
@@ -30,7 +29,6 @@ func (p *Processor) Write(b []byte) (int, error) {
 // Process will continue processing the bbCode until it gets to an end tag
 // which matches the tag name given, or until it reaches the end of the input.
 // It returns true if the end tag was found, or false otherwise.
-// The untilTag must always be lowercase.
 func (p *Processor) Process(untilTag string) bool {
 	for {
 		switch t := p.Get().(type) {
@@ -39,7 +37,7 @@ func (p *Processor) Process(untilTag string) bool {
 		case OpenTag:
 			p.ProcessTag(t)
 		case CloseTag:
-			if t.Name == untilTag {
+			if Compare(t.Name, untilTag) {
 				return true
 			}
 			p.printCloseTag(t)
@@ -67,7 +65,7 @@ Loop:
 		case OpenTag:
 			p.printOpenTag(t)
 		case CloseTag:
-			if t.Name == untilTag {
+			if Compare(t.Name, untilTag) {
 				break Loop
 			}
 			p.printCloseTag(t)
@@ -96,7 +94,7 @@ func (p *Processor) ProcessTag(t OpenTag) {
 
 func (p *Processor) getTagHandler(name string) Handler {
 	for _, tag := range p.bbCode.tags {
-		if tag.Name() == name {
+		if Compare(tag.Name(), name) {
 			return tag
 		}
 	}
@@ -116,14 +114,14 @@ func (p *Processor) Get() interface{} {
 		return text
 	case phraseOpen:
 		tag := OpenTag{
-			Name: strings.ToLower(phrase.Data[0].Data),
+			Name: phrase.Data[0].Data,
 		}
 		if len(phrase.Data) > 1 {
 			tag.Attr = &phrase.Data[1].Data
 		}
 		return tag
 	case phraseClose:
-		return CloseTag{Name: strings.ToLower(phrase.Data[0].Data)}
+		return CloseTag{Name: phrase.Data[0].Data}
 	}
 	return nil
 }

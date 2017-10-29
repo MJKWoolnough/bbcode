@@ -24,5 +24,13 @@ func TestList(t *testing.T) {
 				"	 *Foo",
 			"<ul><li> Hello</li><li> Beep<br />	 Boop</li><li>Foo</li></ul>",
 		},
+		{
+			"[list=a]\n" +
+				" * Hello\n" +
+				"* Beep\n" +
+				"	 Boop\n" +
+				"	 *Foo[/list]",
+			"<ol type=\"a\"><li> Hello</li><li> Beep<br />	 Boop</li><li>Foo</li></ol>",
+		},
 	}, List, Bold)
 }

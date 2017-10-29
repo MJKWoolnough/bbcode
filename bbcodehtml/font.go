@@ -1,24 +1,40 @@
 package bbcodehtml
 
-import "strings"
+import (
+	"strings"
+)
+
+var (
+	georgia    = []byte("Georgia, serif")
+	times      = []byte("\\\"Times New Roman\\\", Times, serif")
+	arial      = []byte("Arial, Helvetica, sans-serif")
+	arialBlack = []byte("\\\"Arial Black\\\", Gadget, sans-serif")
+	comicSans  = []byte("\\\"Comic Sans MS\\\", cursive, sans-serif")
+	impact     = []byte("Impact, Charcoal, sans-serif")
+	courier    = []byte("\\\"Courier New\\\", Courier, monospace")
+	lucida     = []byte("\\\"Lucida Console\\\", Monaco, monospace")
+	sansSerif  = impact[18:]
+	serif      = sansSerif[5:]
+	monospace  = courier[26:]
+)
 
 // Fonts is a map of font names and their css expansion for use as an
 // attribute filter for bbcode.AttributeTag
 var Fonts = fonts{
-	"georgia":         []byte("Georgia, serif"),
-	"times":           []byte("\\\"Times New Roman\\\", Times, serif"),
-	"times new roman": []byte("\\\"Times New Roman\\\", Times, serif"),
-	"arial":           []byte("Arial, Helvetica, sans-serif"),
-	"arial black":     []byte("\\\"Arial Black\\\", Gadget, sans-serif"),
-	"comic sans ms":   []byte("\\\"Comic Sans MS\\\", cursive, sans-serif"),
-	"comic sans":      []byte("\\\"Comic Sans MS\\\", cursive, sans-serif"),
-	"impact":          []byte("Impact, Charcoal, sans-serif"),
-	"verdana":         []byte("Verdana, Geneva, sans-serif"),
-	"courier":         []byte("\\\"Courier New\\\", Courier, monospace"),
-	"lucida console":  []byte("\\\"Lucida Console\\\", Monaco, monospace"),
-	"serif":           []byte("serif"),
-	"sans serif":      []byte("sans-serif"),
-	"monospace":       []byte("monospace"),
+	"georgia":         georgia,
+	"times":           times,
+	"times new roman": times,
+	"arial":           arial,
+	"arial black":     arialBlack,
+	"comic sans ms":   comicSans,
+	"comic sans":      comicSans,
+	"impact":          impact,
+	"verdana":         verdana,
+	"courier":         courier,
+	"lucida console":  lucida,
+	"serif":           serif,
+	"sans serif":      sansSerif,
+	"monospace":       monospace,
 }
 
 type fonts map[string][]byte

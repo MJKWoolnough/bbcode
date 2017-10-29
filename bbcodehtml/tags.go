@@ -39,6 +39,7 @@ var (
 	sizeAttr   = []byte(" style=\"font-size: ")
 )
 
+// The following are some predefined bbcode tags for common applications
 var (
 	Align = bbcode.NewAttributeTag("align", divPartialOpen, tagClose, alignAttr, attrClose, divClose, bbcode.AttrFilterFunc(alignFilter))
 

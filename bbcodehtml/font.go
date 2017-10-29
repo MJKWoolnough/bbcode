@@ -2,6 +2,8 @@ package bbcodehtml
 
 import "strings"
 
+// Fonts is a map of font names and their css expansion for use as an
+// attribute filter for bbcode.AttributeTag
 var Fonts = fonts{
 	"georgia":         []byte("Georgia, serif"),
 	"times":           []byte("\\\"Times New Roman\\\", Times, serif"),
@@ -14,6 +16,9 @@ var Fonts = fonts{
 	"verdana":         []byte("Verdana, Geneva, sans-serif"),
 	"courier":         []byte("\\\"Courier New\\\", Courier, monospace"),
 	"lucida console":  []byte("\\\"Lucida Console\\\", Monaco, monospace"),
+	"serif":           []byte("serif"),
+	"sans serif":      []byte("sans-serif"),
+	"monospace":       []byte("monospace"),
 }
 
 type fonts map[string][]byte

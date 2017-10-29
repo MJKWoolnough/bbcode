@@ -4,6 +4,9 @@ import (
 	"strings"
 )
 
+// Colours is a map of colour names to their hex equivalent. It is used as an
+// attribute filter in an bbcode.AttributeTag where it will recognise the
+// contained colouts as well as raw hex values.
 var Colours = colours{
 	"aliceblue":            []byte("#F0F8FF"),
 	"antiquewhite":         []byte("#FAEBD7"),

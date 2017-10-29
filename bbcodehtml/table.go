@@ -1,6 +1,10 @@
 package bbcodehtml
 
-import "github.com/MJKWoolnough/bbcode"
+import (
+	"strings"
+
+	"github.com/MJKWoolnough/bbcode"
+)
 
 type table struct{}
 
@@ -36,27 +40,27 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			if bbcode.Compare(t.Name, "thead") {
+			if strings.EqualFold(t.Name, "thead") {
 				if !thead {
 					p.Write(tableHeadOpen)
 					tableIHandle(p, "thead")
 					p.Write(tableHeadClose)
 					thead = true
 				}
-			} else if bbcode.Compare(t.Name, "tfoot") {
+			} else if strings.EqualFold(t.Name, "tfoot") {
 				if !tfoot {
 					p.Write(tableFootOpen)
 					tableIHandle(p, "tfoot")
 					p.Write(tableFootClose)
 					tfoot = true
 				}
-			} else if bbcode.Compare(t.Name, "row") || bbcode.Compare(t.Name, "tr") {
+			} else if strings.EqualFold(t.Name, "row") || strings.EqualFold(t.Name, "tr") {
 				p.Write(trOpen)
 				tableRow(p, t.Name)
 				p.Write(trClose)
 			}
 		case bbcode.CloseTag:
-			if bbcode.Compare(t.Name, "table") {
+			if strings.EqualFold(t.Name, "table") {
 				break Loop
 			}
 		default:
@@ -71,7 +75,7 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			if bbcode.Compare(t.Name, "row") || bbcode.Compare(t.Name, "tr") {
+			if strings.EqualFold(t.Name, "row") || strings.EqualFold(t.Name, "tr") {
 				p.Write(trOpen)
 				tableRow(p, t.Name)
 				p.Write(trClose)
@@ -92,11 +96,11 @@ Loop:
 		switch t := p.Get().(type) {
 		case bbcode.Text:
 		case bbcode.OpenTag:
-			if bbcode.Compare(t.Name, "col") || bbcode.Compare(t.Name, "td") {
+			if strings.EqualFold(t.Name, "col") || strings.EqualFold(t.Name, "td") {
 				p.Write(tdOpen)
 				p.Process(t.Name)
 				p.Write(tdClose)
-			} else if bbcode.Compare(t.Name, "th") {
+			} else if strings.EqualFold(t.Name, "th") {
 				p.Write(thOpen)
 				p.Process(t.Name)
 				p.Write(thClose)

@@ -2,6 +2,7 @@ package bbcode
 
 import (
 	"io"
+	"strings"
 
 	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/parser"
@@ -37,7 +38,7 @@ func (p *Processor) Process(untilTag string) bool {
 		case OpenTag:
 			p.ProcessTag(t)
 		case CloseTag:
-			if Compare(t.Name, untilTag) {
+			if strings.EqualFold(t.Name, untilTag) {
 				return true
 			}
 			p.printCloseTag(t)
@@ -65,7 +66,7 @@ Loop:
 		case OpenTag:
 			p.printOpenTag(t)
 		case CloseTag:
-			if Compare(t.Name, untilTag) {
+			if strings.EqualFold(t.Name, untilTag) {
 				break Loop
 			}
 			p.printCloseTag(t)
@@ -94,7 +95,7 @@ func (p *Processor) ProcessTag(t OpenTag) {
 
 func (p *Processor) getTagHandler(name string) Handler {
 	for _, tag := range p.bbCode.tags {
-		if Compare(tag.Name(), name) {
+		if strings.EqualFold(tag.Name(), name) {
 			return tag
 		}
 	}

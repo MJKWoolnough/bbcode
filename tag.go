@@ -203,7 +203,7 @@ Loop:
 				p.Print(t)
 			}
 		case CloseTag:
-			if Compare(t.Name, name) {
+			if strings.EqualFold(t.Name, name) {
 				break Loop
 			}
 			if allowText {

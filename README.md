@@ -15,13 +15,6 @@ var (
 )
 ```
 
-#### func  Compare
-
-```go
-func Compare(a, b string) bool
-```
-Compare preforms a case-insensitive string comparison
-
 #### type AttrFilterFunc
 
 ```go

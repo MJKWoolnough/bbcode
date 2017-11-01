@@ -27,7 +27,7 @@ func getTokeniser(c Config) tokeniser {
 		openTag:          string(c.TagOpen),
 		closeTag:         string(c.TagClose),
 		closingTag:       string(c.ClosingTag),
-		validTagName:     string(c.ValidTagName),
+		validTagName:     c.ValidTagName,
 		attributeSep:     string(c.AttributeSep),
 		closeTagRune:     c.TagClose,
 		closingTagRune:   c.ClosingTag,

@@ -7,10 +7,12 @@ import (
 	"github.com/MJKWoolnough/bbcode"
 )
 
-var (
-	urlOpen  = []byte("<a href=\"")
-	urlClose = []byte("</a>")
+const (
+	urlTag  = "url"
+	urlOpen = "<a href=%q>"
 )
+
+var urlClose = []byte("</a>")
 
 type url struct{}
 
@@ -22,17 +24,17 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 	if attr != "" {
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			fmt.Fprintf(p, "<a href=%q>", u)
-			p.Process("url")
+			fmt.Fprintf(p, urlOpen, u)
+			p.Process(urlTag)
 			p.Write(urlClose)
 		} else {
-			p.Process("url")
+			p.Process(urlTag)
 		}
 	} else {
-		attr = p.GetContents("url")
+		attr = p.GetContents(urlTag)
 		u, err := nurl.Parse(attr)
 		if err == nil {
-			fmt.Fprintf(p, "<a href=%q>", u)
+			fmt.Fprintf(p, urlOpen, u)
 			p.Print(attr)
 			p.Write(urlClose)
 		} else {

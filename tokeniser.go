@@ -45,8 +45,8 @@ func (tks *tokeniser) getParser(t parser.Tokeniser) parser.Parser {
 func (tks *tokeniser) text(t *parser.Tokeniser) (parser.Token, parser.TokenFunc) {
 	t.ExceptRun(tks.openTag)
 	tk := parser.Token{
-		tokenText,
-		t.Get(),
+		Type: tokenText,
+		Data: t.Get(),
 	}
 	if t.Peek() == -1 {
 		if tk.Data == "" {
@@ -83,8 +83,8 @@ func (tks *tokeniser) opening(t *parser.Tokeniser) (parser.Token, parser.TokenFu
 		t.Accept(tks.attributeSep)
 		if t.ExceptRun(tks.closeTag) != tks.closeTagRune {
 			return parser.Token{
-				tokenText,
-				data,
+				Type: tokenText,
+				Data: data,
 			}, tks.text
 		}
 		next = tks.attribute
@@ -93,8 +93,8 @@ func (tks *tokeniser) opening(t *parser.Tokeniser) (parser.Token, parser.TokenFu
 	}
 	data = data[1:]
 	return parser.Token{
-		tokenOpenTag,
-		data,
+		Type: tokenOpenTag,
+		Data: data,
 	}, next
 }
 
@@ -109,8 +109,8 @@ func (tks *tokeniser) closing(t *parser.Tokeniser) (parser.Token, parser.TokenFu
 		t.Accept(tks.closeTag)
 		t.Get()
 		return parser.Token{
-			tokenCloseTag,
-			data[2:],
+			Type: tokenCloseTag,
+			Data: data[2:],
 		}, tks.text
 	}
 	return tks.text(t)
@@ -121,8 +121,8 @@ func (tks *tokeniser) attribute(t *parser.Tokeniser) (parser.Token, parser.Token
 	t.Accept(tks.closeTag)
 	t.Get()
 	return parser.Token{
-		tokenTagAttribute,
-		data[1:],
+		Type: tokenTagAttribute,
+		Data: data[1:],
 	}, tks.text
 }
 

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/MJKWoolnough/bbcode"
-	"github.com/MJKWoolnough/memio"
+	"vimagination.zapto.org/bbcode"
+	"vimagination.zapto.org/memio"
 )
 
 type inout struct {

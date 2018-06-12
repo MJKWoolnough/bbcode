@@ -4,8 +4,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/MJKWoolnough/memio"
-	"github.com/MJKWoolnough/parser"
+	"vimagination.zapto.org/memio"
+	"vimagination.zapto.org/parser"
 )
 
 // Processor contains methods necessary for creating custom Handler's

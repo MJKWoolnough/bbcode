@@ -4,7 +4,7 @@ import (
 	"fmt"
 	nurl "net/url"
 
-	"github.com/MJKWoolnough/bbcode"
+	"vimagination.zapto.org/bbcode"
 )
 
 const (

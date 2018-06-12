@@ -3,7 +3,7 @@ package bbcodehtml
 import (
 	"strings"
 
-	"github.com/MJKWoolnough/bbcode"
+	"vimagination.zapto.org/bbcode"
 )
 
 type table struct{}

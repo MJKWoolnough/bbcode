@@ -1,12 +1,12 @@
-package bbcodehtml
+package bbcodehtml // import "vimagination.zapto.org/bbcode/bbcodehtml"
 
 import (
 	"html/template"
 	"strconv"
 	"strings"
 
-	"github.com/MJKWoolnough/bbcode"
-	"github.com/MJKWoolnough/memio"
+	"vimagination.zapto.org/bbcode"
+	"vimagination.zapto.org/memio"
 )
 
 var (

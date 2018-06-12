@@ -3,7 +3,7 @@ package bbcode
 import (
 	"testing"
 
-	"github.com/MJKWoolnough/parser"
+	"vimagination.zapto.org/parser"
 )
 
 func TestTokeniser(t *testing.T) {

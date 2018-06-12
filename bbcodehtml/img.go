@@ -6,8 +6,8 @@ import (
 	nurl "net/url"
 	"strings"
 
-	"github.com/MJKWoolnough/bbcode"
-	"github.com/MJKWoolnough/memio"
+	"vimagination.zapto.org/bbcode"
+	"vimagination.zapto.org/memio"
 )
 
 var (

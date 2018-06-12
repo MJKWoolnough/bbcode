@@ -1,6 +1,6 @@
 package bbcodehtml
 
-import "github.com/MJKWoolnough/bbcode"
+import "vimagination.zapto.org/bbcode"
 
 type code struct{}
 

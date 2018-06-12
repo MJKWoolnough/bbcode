@@ -4,7 +4,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/MJKWoolnough/memio"
+	"vimagination.zapto.org/memio"
 )
 
 // Handler is an interface that represents the text and tag processors

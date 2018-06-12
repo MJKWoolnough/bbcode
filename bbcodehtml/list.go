@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/MJKWoolnough/bbcode"
+	"vimagination.zapto.org/bbcode"
 )
 
 type list struct{}

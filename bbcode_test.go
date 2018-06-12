@@ -3,7 +3,7 @@ package bbcode
 import (
 	"testing"
 
-	"github.com/MJKWoolnough/memio"
+	"vimagination.zapto.org/memio"
 )
 
 var (

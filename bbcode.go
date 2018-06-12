@@ -1,10 +1,10 @@
 // Package bbcode implements a bbcode parser and converter
-package bbcode
+package bbcode // import "vimagination.zapto.org/bbcode"
 
 import (
 	"io"
 
-	"github.com/MJKWoolnough/parser"
+	"vimagination.zapto.org/parser"
 )
 
 // Config changes how the syntax of the inteperated bbCode

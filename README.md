@@ -1,6 +1,6 @@
 # bbcode
 --
-    import "github.com/MJKWoolnough/bbcode"
+    import "vimagination.zapto.org/bbcode"
 
 Package bbcode implements a bbcode parser and converter
 

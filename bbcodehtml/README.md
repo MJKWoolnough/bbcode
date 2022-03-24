@@ -1,6 +1,6 @@
 # bbcodehtml
 --
-    import "github.com/MJKWoolnough/bbcode/bbcodehtml"
+    import "vimagination.zapto.org/bbcode/bbcodehtml"
 
 
 ## Usage

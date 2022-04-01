@@ -1,10 +1,9 @@
 package bbcode
 
 import (
+	"bytes"
 	"strings"
 	"text/template"
-
-	"vimagination.zapto.org/memio"
 )
 
 // Handler is an interface that represents the text and tag processors
@@ -71,9 +70,9 @@ func (attrFilter) AttrFilter(attr string) []byte {
 		if !strings.ContainsAny(attr, "'\"&<>\000") {
 			return []byte(attr)
 		}
-		var b memio.Buffer
+		var b bytes.Buffer
 		template.HTMLEscape(&b, []byte(attr))
-		return b
+		return b.Bytes()
 	}
 	return nil
 }

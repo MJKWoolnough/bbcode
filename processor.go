@@ -1,10 +1,10 @@
 package bbcode
 
 import (
+	"bytes"
 	"io"
 	"strings"
 
-	"vimagination.zapto.org/memio"
 	"vimagination.zapto.org/parser"
 )
 
@@ -54,8 +54,8 @@ func (p *Processor) GetContents(untilTag string) string {
 		return ""
 	}
 	w := p.w
-	b := make(memio.Buffer, 0, 1024)
-	p.w = &b
+	b := bytes.NewBuffer(make([]byte, 0, 1024))
+	p.w = b
 	t := p.bbCode.text
 	p.bbCode.text = PlainText
 Loop:
@@ -76,7 +76,7 @@ Loop:
 	}
 	p.bbCode.text = t
 	p.w = w
-	return string(b)
+	return string(b.Bytes())
 }
 
 // ProcessTag will process the given tag as normal

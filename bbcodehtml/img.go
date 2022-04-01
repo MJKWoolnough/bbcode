@@ -1,13 +1,13 @@
 package bbcodehtml
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	nurl "net/url"
 	"strings"
 
 	"vimagination.zapto.org/bbcode"
-	"vimagination.zapto.org/memio"
 )
 
 var (
@@ -28,9 +28,9 @@ func (img) Handle(p *bbcode.Processor, attr string) {
 			p.Write(imgOpen)
 			if attr != "" {
 				p.Write(altOpen)
-				var b memio.Buffer
+				var b bytes.Buffer
 				template.HTMLEscape(&b, []byte(attr))
-				p.Write(b)
+				p.Write(b.Bytes())
 				p.Write(attrClose)
 			}
 			fmt.Fprintf(p, " src=%q />", u)

@@ -1,12 +1,12 @@
 package bbcodehtml // import "vimagination.zapto.org/bbcode/bbcodehtml"
 
 import (
+	"bytes"
 	"html/template"
 	"strconv"
 	"strings"
 
 	"vimagination.zapto.org/bbcode"
-	"vimagination.zapto.org/memio"
 )
 
 var (
@@ -106,7 +106,7 @@ func notEmptyFilter(attr string) []byte {
 	} else if !strings.ContainsAny(attr, "'\"&<>\000") {
 		return []byte(attr)
 	}
-	var b memio.Buffer
+	var b bytes.Buffer
 	template.HTMLEscape(&b, []byte(attr))
-	return b
+	return b.Bytes()
 }

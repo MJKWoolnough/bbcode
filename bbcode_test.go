@@ -1,9 +1,8 @@
 package bbcode
 
 import (
+	"bytes"
 	"testing"
-
-	"vimagination.zapto.org/memio"
 )
 
 var (
@@ -18,7 +17,7 @@ func passFilter(a string) []byte {
 }
 
 func TestParse(t *testing.T) {
-	buf := make(memio.Buffer, 0, 1024)
+	buf := bytes.NewBuffer(make([]byte, 0, 1024))
 	b := New(
 		HTMLText,
 		NewTag("b", []byte("<b>"), []byte("</b>")),
@@ -49,10 +48,10 @@ func TestParse(t *testing.T) {
 			"<span style=\"color: #fff\">White</span>",
 		},
 	} {
-		buf = buf[:0]
-		b.ConvertString(&buf, test.Input)
-		if string(buf) != test.Output {
-			t.Errorf("test %d: expecting %q, got %q", n+1, test.Output, string(buf))
+		buf.Reset()
+		b.ConvertString(buf, test.Input)
+		if str := buf.String(); str != test.Output {
+			t.Errorf("test %d: expecting %q, got %q", n+1, test.Output, str)
 		}
 	}
 }

@@ -76,7 +76,7 @@ Loop:
 	}
 	p.bbCode.text = t
 	p.w = w
-	return string(b.Bytes())
+	return b.String()
 }
 
 // ProcessTag will process the given tag as normal

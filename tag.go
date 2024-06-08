@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-// Handler is an interface that represents the text and tag processors
+// Handler is an interface that represents the text and tag processors.
 type Handler interface {
 	// Name returns the name of the bbCode tag that this will be used for.
 	// Returning an empty string indicates that this Handler should be used
@@ -16,7 +16,7 @@ type Handler interface {
 	Handle(*Processor, string)
 }
 
-// Tag is a simple Handler that just outputs open and closing tags
+// Tag is a simple Handler that just outputs open and closing tags.
 type Tag struct {
 	name        string
 	open, close []byte
@@ -33,22 +33,22 @@ func NewTag(name string, open, close []byte) *Tag {
 	}
 }
 
-// Name returns the name of the tag
+// Name returns the name of the tag.
 func (t *Tag) Name() string {
 	return t.name
 }
 
-// Open outputs the opening of the tag
+// Open outputs the opening of the tag.
 func (t *Tag) Open(p *Processor, attr string) {
 	p.Write(t.open)
 }
 
-// Close outputs the closing of the tag
+// Close outputs the closing of the tag.
 func (t *Tag) Close(p *Processor, attr string) {
 	p.Write(t.close)
 }
 
-// Handle processes the tag
+// Handle processes the tag.
 func (t *Tag) Handle(p *Processor, attr string) {
 	t.Open(p, attr)
 	p.Process(t.name)
@@ -70,18 +70,22 @@ func (attrFilter) AttrFilter(attr string) []byte {
 		if !strings.ContainsAny(attr, "'\"&<>\000") {
 			return []byte(attr)
 		}
+
 		var b bytes.Buffer
+
 		template.HTMLEscape(&b, []byte(attr))
+
 		return b.Bytes()
 	}
+
 	return nil
 }
 
 // AttrFilterFunc is a wrapper for a func so that it satisfies the AttrFilterer
-// interface
+// interface.
 type AttrFilterFunc func(string) []byte
 
-// AttrFilter satisfies the AttrFilterer interface
+// AttrFilter satisfies the AttrFilterer interface.
 func (a AttrFilterFunc) AttrFilter(attr string) []byte {
 	return a(attr)
 }
@@ -113,11 +117,12 @@ type AttributeTag struct {
 //		colourChecker)
 //
 // A nil filter means that the attr will be written to the output with HTML
-// encoding
+// encoding.
 func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []byte, filter AttrFilterer) *AttributeTag {
 	if filter == nil {
 		filter = &defaultAttrFilter
 	}
+
 	return &AttributeTag{
 		name:      name,
 		open:      open,
@@ -129,28 +134,30 @@ func NewAttributeTag(name string, open, openClose, attrOpen, attrClose, close []
 	}
 }
 
-// Name returns the name of the tag
+// Name returns the name of the tag.
 func (a *AttributeTag) Name() string {
 	return a.name
 }
 
-// Open outputs the opening of the tag
+// Open outputs the opening of the tag.
 func (a *AttributeTag) Open(p *Processor, attr string) {
 	p.Write(a.open)
+
 	if filtered := a.filter.AttrFilter(attr); filtered != nil {
 		p.Write(a.attrOpen)
 		p.Write(filtered)
 		p.Write(a.attrClose)
 	}
+
 	p.Write(a.openClose)
 }
 
-// Close outputs the closing of the tag
+// Close outputs the closing of the tag.
 func (a *AttributeTag) Close(p *Processor, attr string) {
 	p.Write(a.close)
 }
 
-// Handle processes the tag
+// Handle processes the tag.
 func (a *AttributeTag) Handle(p *Processor, attr string) {
 	a.Open(p, attr)
 	p.Process(a.name)
@@ -158,14 +165,14 @@ func (a *AttributeTag) Handle(p *Processor, attr string) {
 }
 
 // OpenClose is an interface for the methods required by FilterTag. Both Tag
-// and AttributeTag implement this interface
+// and AttributeTag implement this interface.
 type OpenClose interface {
 	Name() string
 	Open(*Processor, string)
 	Close(*Processor, string)
 }
 
-// FilterTag is a Handler that filters which child nodes are processed
+// FilterTag is a Handler that filters which child nodes are processed.
 type FilterTag struct {
 	OpenClose
 	filter func(string) bool
@@ -183,11 +190,13 @@ func NewFilterTag(o OpenClose, filter func(string) bool) *FilterTag {
 }
 
 // Handle processes the tag, using its filter to determine which children are
-// also processed
+// also processed.
 func (f *FilterTag) Handle(p *Processor, attr string) {
 	f.Open(p, attr)
+
 	allowText := f.filter("")
 	name := f.Name()
+
 Loop:
 	for {
 		switch t := p.Get().(type) {
@@ -212,5 +221,6 @@ Loop:
 			break Loop
 		}
 	}
+
 	f.Close(p, attr)
 }

@@ -22,8 +22,7 @@ func (url) Name() string {
 
 func (url) Handle(p *bbcode.Processor, attr string) {
 	if attr != "" {
-		u, err := nurl.Parse(attr)
-		if err == nil {
+		if u, err := nurl.Parse(attr); err == nil {
 			fmt.Fprintf(p, urlOpen, u)
 			p.Process(urlTag)
 			p.Write(urlClose)
@@ -32,8 +31,8 @@ func (url) Handle(p *bbcode.Processor, attr string) {
 		}
 	} else {
 		attr = p.GetContents(urlTag)
-		u, err := nurl.Parse(attr)
-		if err == nil {
+
+		if u, err := nurl.Parse(attr); err == nil {
 			fmt.Fprintf(p, urlOpen, u)
 			p.Print(attr)
 			p.Write(urlClose)

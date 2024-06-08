@@ -28,6 +28,7 @@ var (
 
 func (list) Handle(p *bbcode.Processor, attr string) {
 	closer := oListClose
+
 	switch attr {
 	case "a":
 		p.Write(oaList)
@@ -41,6 +42,7 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 		p.Write(o1List)
 	default:
 		p.Write(uListOpen)
+
 		closer = uListClose
 	}
 
@@ -48,13 +50,12 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 
 	var processed bool
 
-	if text, ok := t.(bbcode.Text); ok {
-		if strings.HasPrefix(strings.TrimLeftFunc(text[0], unicode.IsSpace), "*") {
-			p.Write(liOpen)
-			handleLiText(p, text)
-			p.Write(liClose)
-			processed = true
-		}
+	if text, ok := t.(bbcode.Text); ok && strings.HasPrefix(strings.TrimLeftFunc(text[0], unicode.IsSpace), "*") {
+		p.Write(liOpen)
+		handleLiText(p, text)
+		p.Write(liClose)
+
+		processed = true
 	}
 
 	if !processed {
@@ -63,10 +64,8 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 			switch t := t.(type) {
 			case bbcode.Text:
 			case bbcode.OpenTag:
-				if t.Name == "*" {
-					if handleLi(p) {
-						break Loop
-					}
+				if t.Name == "*" && handleLi(p) {
+					break Loop
 				}
 			case bbcode.CloseTag:
 				if strings.EqualFold(t.Name, "list") {
@@ -75,6 +74,7 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 			default:
 				break Loop
 			}
+
 			t = p.Get()
 		}
 	}
@@ -84,6 +84,7 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 
 func handleLi(p *bbcode.Processor) bool {
 	p.Write(liOpen)
+
 	for {
 		switch t := p.Get().(type) {
 		case bbcode.Text:
@@ -98,14 +99,18 @@ func handleLi(p *bbcode.Processor) bool {
 		case bbcode.CloseTag:
 			if t.Name == "*" {
 				p.Write(liClose)
+
 				return false
 			} else if strings.EqualFold(t.Name, "list") {
 				p.Write(liClose)
+
 				return true
 			}
+
 			p.Print(t)
 		default:
 			p.Write(liClose)
+
 			return true
 		}
 	}
@@ -117,6 +122,7 @@ func handleLiText(p *bbcode.Processor, s interface{}) {
 		lastNewLine [2]int
 		firstDone   bool
 	)
+
 Loop:
 	for {
 		switch t := s.(type) {
@@ -137,10 +143,12 @@ Loop:
 							} else {
 								firstDone = true
 							}
+
 							t = t[lastNewLine[0]:]
 							t[0] = t[0][n+1:]
 							s = t
 							start = false
+
 							continue Loop
 						} else if !unicode.IsSpace(c) {
 							start = false
@@ -148,6 +156,7 @@ Loop:
 					}
 				}
 			}
+
 			p.Print(t)
 		case bbcode.OpenTag:
 			p.ProcessTag(t)
@@ -155,10 +164,12 @@ Loop:
 			if strings.EqualFold(t.Name, "list") {
 				return
 			}
+
 			p.Print(t)
 		default:
 			return
 		}
+
 		start = false
 		s = p.Get()
 	}

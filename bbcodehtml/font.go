@@ -20,7 +20,7 @@ var (
 )
 
 // Fonts is a map of font names and their css expansion for use as an
-// attribute filter for bbcode.AttributeTag
+// attribute filter for bbcode.AttributeTag.
 var Fonts = fonts{
 	"georgia":         georgia,
 	"times":           times,
@@ -44,5 +44,6 @@ func (f fonts) AttrFilter(attr string) []byte {
 	if font, ok := f[strings.ToLower(attr)]; ok {
 		return font
 	}
+
 	return nil
 }

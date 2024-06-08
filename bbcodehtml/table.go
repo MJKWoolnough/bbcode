@@ -45,6 +45,7 @@ Loop:
 					p.Write(tableHeadOpen)
 					tableIHandle(p, "thead")
 					p.Write(tableHeadClose)
+
 					thead = true
 				}
 			} else if strings.EqualFold(t.Name, "tfoot") {
@@ -52,6 +53,7 @@ Loop:
 					p.Write(tableFootOpen)
 					tableIHandle(p, "tfoot")
 					p.Write(tableFootClose)
+
 					tfoot = true
 				}
 			} else if strings.EqualFold(t.Name, "row") || strings.EqualFold(t.Name, "tr") {

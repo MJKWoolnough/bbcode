@@ -39,7 +39,7 @@ var (
 	sizeAttr   = []byte(" style=\"font-size: ")
 )
 
-// The following are some predefined bbcode tags for common applications
+// The following are some predefined bbcode tags for common applications.
 var (
 	Align = bbcode.NewAttributeTag("align", divPartialOpen, tagClose, alignAttr, attrClose, divClose, bbcode.AttrFilterFunc(alignFilter))
 
@@ -89,14 +89,15 @@ func alignFilter(attr string) []byte {
 	case "full", "justify", "fulljustify", "full-justify", "full justify":
 		return alignFull
 	}
+
 	return nil
 }
 
 func sizeFilter(attr string) []byte {
-	n, _ := strconv.Atoi(attr)
-	if n >= 1 && n <= 50 {
+	if n, _ := strconv.Atoi(attr); n >= 1 && n <= 50 {
 		return []byte(attr)
 	}
+
 	return nil
 }
 
@@ -106,7 +107,10 @@ func notEmptyFilter(attr string) []byte {
 	} else if !strings.ContainsAny(attr, "'\"&<>\000") {
 		return []byte(attr)
 	}
+
 	var b bytes.Buffer
+
 	template.HTMLEscape(&b, []byte(attr))
+
 	return b.Bytes()
 }

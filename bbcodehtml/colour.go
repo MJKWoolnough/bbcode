@@ -165,13 +165,14 @@ func hexFunc(r rune) bool {
 }
 
 func (c colours) AttrFilter(attr string) []byte {
-	var hex []byte
 	if len(attr) > 0 {
-		var ok bool
-		if hex, ok = c[strings.ToLower(attr)]; !ok {
+		hex, ok := c[strings.ToLower(attr)]
+
+		if !ok {
 			if attr[0] == '#' {
 				attr = attr[1:]
 			}
+
 			switch len(attr) {
 			case 3, 6:
 				if strings.IndexFunc(attr, hexFunc) < 0 {
@@ -181,6 +182,9 @@ func (c colours) AttrFilter(attr string) []byte {
 				}
 			}
 		}
+
+		return hex
 	}
-	return hex
+
+	return nil
 }

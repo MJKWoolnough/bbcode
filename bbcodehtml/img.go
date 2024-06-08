@@ -26,13 +26,16 @@ func (img) Handle(p *bbcode.Processor, attr string) {
 		switch strings.ToLower(u.Scheme) {
 		case "http", "https":
 			p.Write(imgOpen)
+
 			if attr != "" {
-				p.Write(altOpen)
 				var b bytes.Buffer
+
+				p.Write(altOpen)
 				template.HTMLEscape(&b, []byte(attr))
 				p.Write(b.Bytes())
 				p.Write(attrClose)
 			}
+
 			fmt.Fprintf(p, " src=%q />", u)
 		}
 	}

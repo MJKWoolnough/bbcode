@@ -169,8 +169,5 @@ func (tks *tokeniser) phraser(p *parser.Parser) (parser.Phrase, parser.PhraseFun
 		return p.Error()
 	}
 
-	return parser.Phrase{
-		Type: phraseType,
-		Data: p.Get(),
-	}, tks.phraser
+	return p.Return(phraseType, tks.phraser)
 }

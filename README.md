@@ -8,9 +8,9 @@ Package bbcode implements a bbcode parser and converter
 
 ```go
 var (
-	// HTMLText is a text processor that will HTML encode all text output
+	// HTMLText is a text processor that will HTML encode all text output.
 	HTMLText htmlText
-	// PlainText is a text processor that just outputs all text with no change
+	// PlainText is a text processor that just outputs all text with no change.
 	PlainText plainText
 )
 ```
@@ -22,14 +22,14 @@ type AttrFilterFunc func(string) []byte
 ```
 
 AttrFilterFunc is a wrapper for a func so that it satisfies the AttrFilterer
-interface
+interface.
 
 #### func (AttrFilterFunc) AttrFilter
 
 ```go
 func (a AttrFilterFunc) AttrFilter(attr string) []byte
 ```
-AttrFilter satisfies the AttrFilterer interface
+AttrFilter satisfies the AttrFilterer interface.
 
 #### type AttrFilterer
 
@@ -74,35 +74,35 @@ example the following would create a colour tag for handling font colour:
     	colourChecker)
 
 A nil filter means that the attr will be written to the output with HTML
-encoding
+encoding.
 
 #### func (*AttributeTag) Close
 
 ```go
 func (a *AttributeTag) Close(p *Processor, attr string)
 ```
-Close outputs the closing of the tag
+Close outputs the closing of the tag.
 
 #### func (*AttributeTag) Handle
 
 ```go
 func (a *AttributeTag) Handle(p *Processor, attr string)
 ```
-Handle processes the tag
+Handle processes the tag.
 
 #### func (*AttributeTag) Name
 
 ```go
 func (a *AttributeTag) Name() string
 ```
-Name returns the name of the tag
+Name returns the name of the tag.
 
 #### func (*AttributeTag) Open
 
 ```go
 func (a *AttributeTag) Open(p *Processor, attr string)
 ```
-Open outputs the opening of the tag
+Open outputs the opening of the tag.
 
 #### type BBCode
 
@@ -111,7 +111,7 @@ type BBCode struct {
 }
 ```
 
-BBCode is a fully configured parser
+BBCode is a fully configured parser.
 
 #### func  New
 
@@ -119,7 +119,7 @@ BBCode is a fully configured parser
 func New(tags ...Handler) *BBCode
 ```
 New create a new bbCode parser with the default configuration. See NewWithConfig
-for more information
+for more information.
 
 #### func  NewWithConfig
 
@@ -137,21 +137,21 @@ be used to process the text. By default, this is the HTMLText handler.
 func (b *BBCode) Convert(w io.Writer, input []byte) error
 ```
 Convert parses the byte slice and writes the output to the writer. Any error
-will be from the writing process and not from the parser
+will be from the writing process and not from the parser.
 
 #### func (*BBCode) ConvertReader
 
 ```go
 func (b *BBCode) ConvertReader(w io.Writer, input io.Reader) error
 ```
-ConvertReader functions like Convert, but takes a io.Reader
+ConvertReader functions like Convert, but takes a io.Reader.
 
 #### func (*BBCode) ConvertString
 
 ```go
 func (b *BBCode) ConvertString(w io.Writer, input string) error
 ```
-ConvertString functions like Convert, but takes a string
+ConvertString functions like Convert, but takes a string.
 
 #### type CloseTag
 
@@ -161,39 +161,39 @@ type CloseTag struct {
 }
 ```
 
-CloseTag is a token containing the name of the tag
+CloseTag is a token containing the name of the tag.
 
 #### type Config
 
 ```go
 type Config struct {
 	// TagOpen is the character used to open the tags.
-	// In the default configuration this is the open bracket '['
+	// In the default configuration this is the open bracket '['.
 	TagOpen rune
 
 	// TagClose is the character used to close the tags.
-	// In the default configuration this is the close bracket ']'
+	// In the default configuration this is the close bracket ']'.
 	TagClose rune
 
 	// ClosingTag is the character used to define a closing tag, as opposed
 	// to an opening tag.
-	// In the default configuration, this is the slash '/'
+	// In the default configuration, this is the slash '/'.
 	ClosingTag rune
 
 	// AttributeSep is the character used to separate the tag name from the
 	// attribute.
-	// In the default configuration this is the equals sign '='
+	// In the default configuration this is the equals sign '='.
 	AttributeSep rune
 
 	// ValidTagName lists the characters that are allowed in the tag names.
 	// Neither of the TagClose or AttributeSep characters should be in this
 	// list.
-	// In the default configuration this is A-Z a-z 0-9 and the asterix
+	// In the default configuration this is A-Z a-z 0-9 and the asterisk.
 	ValidTagName string
 }
 ```
 
-Config changes how the syntax of the inteperated bbCode
+Config changes how the syntax of the interpreted bbCode.
 
 #### type FilterTag
 
@@ -203,7 +203,7 @@ type FilterTag struct {
 }
 ```
 
-FilterTag is a Handler that filters which child nodes are processed
+FilterTag is a Handler that filters which child nodes are processed.
 
 #### func  NewFilterTag
 
@@ -221,7 +221,7 @@ to determine is text is processed.
 func (f *FilterTag) Handle(p *Processor, attr string)
 ```
 Handle processes the tag, using its filter to determine which children are also
-processed
+processed.
 
 #### type Handler
 
@@ -236,7 +236,7 @@ type Handler interface {
 }
 ```
 
-Handler is an interface that represents the text and tag processors
+Handler is an interface that represents the text and tag processors.
 
 #### type OpenClose
 
@@ -249,7 +249,7 @@ type OpenClose interface {
 ```
 
 OpenClose is an interface for the methods required by FilterTag. Both Tag and
-AttributeTag implement this interface
+AttributeTag implement this interface.
 
 #### type OpenTag
 
@@ -260,7 +260,7 @@ type OpenTag struct {
 }
 ```
 
-OpenTag is a token containing the name of the tag and a possible attribute.
+OpenTag is a token containing the name of the tag and a possible attribute..
 
 #### type Processor
 
@@ -269,21 +269,21 @@ type Processor struct {
 }
 ```
 
-Processor contains methods necessary for creating custom Handler's
+Processor contains methods necessary for creating custom Handler's.
 
 #### func (*Processor) Get
 
 ```go
 func (p *Processor) Get() interface{}
 ```
-Get returns the next token. It will be either a Text, OpenTag or a CloseTag
+Get returns the next token. It will be either a Text, OpenTag or a CloseTag.
 
 #### func (*Processor) GetContents
 
 ```go
 func (p *Processor) GetContents(untilTag string) string
 ```
-GetContents grabs the raw contents of a tag and returns it as a string
+GetContents grabs the raw contents of a tag and returns it as a string.
 
 #### func (*Processor) Print
 
@@ -291,7 +291,7 @@ GetContents grabs the raw contents of a tag and returns it as a string
 func (p *Processor) Print(t interface{})
 ```
 Print writes the textual representation of the given token to the output, using
-the text Handler
+the text Handler.
 
 #### func (*Processor) Process
 
@@ -307,7 +307,7 @@ true if the end tag was found, or false otherwise.
 ```go
 func (p *Processor) ProcessTag(t OpenTag)
 ```
-ProcessTag will process the given tag as normal
+ProcessTag will process the given tag as normal.
 
 #### func (*Processor) Write
 
@@ -315,7 +315,7 @@ ProcessTag will process the given tag as normal
 func (p *Processor) Write(b []byte) (int, error)
 ```
 Write writes to the underlying writer. The error is stored and does not need to
-be handled
+be handled.
 
 #### type Tag
 
@@ -324,7 +324,7 @@ type Tag struct {
 }
 ```
 
-Tag is a simple Handler that just outputs open and closing tags
+Tag is a simple Handler that just outputs open and closing tags.
 
 #### func  NewTag
 
@@ -341,28 +341,28 @@ the following would be used to create a tag for handling bold:
 ```go
 func (t *Tag) Close(p *Processor, attr string)
 ```
-Close outputs the closing of the tag
+Close outputs the closing of the tag.
 
 #### func (*Tag) Handle
 
 ```go
 func (t *Tag) Handle(p *Processor, attr string)
 ```
-Handle processes the tag
+Handle processes the tag.
 
 #### func (*Tag) Name
 
 ```go
 func (t *Tag) Name() string
 ```
-Name returns the name of the tag
+Name returns the name of the tag.
 
 #### func (*Tag) Open
 
 ```go
 func (t *Tag) Open(p *Processor, attr string)
 ```
-Open outputs the opening of the tag
+Open outputs the opening of the tag.
 
 #### type Text
 
@@ -370,4 +370,4 @@ Open outputs the opening of the tag
 type Text []string
 ```
 
-Text is a token containing simple textual data
+Text is a token containing simple textual data.

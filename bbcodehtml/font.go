@@ -19,7 +19,7 @@ var (
 	monospace  = courier[26:]
 )
 
-// Fonts is a map of font names and their css expansion for use as an
+// Fonts is a map of font names and their CSS expansion for use as an
 // attribute filter for bbcode.AttributeTag.
 var Fonts = fonts{
 	"georgia":         georgia,

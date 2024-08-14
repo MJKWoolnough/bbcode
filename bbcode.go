@@ -7,7 +7,7 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-// Config changes how the syntax of the inteperated bbCode.
+// Config changes how the syntax of the interpreted bbCode.
 type Config struct {
 	// TagOpen is the character used to open the tags.
 	// In the default configuration this is the open bracket '['.
@@ -30,7 +30,7 @@ type Config struct {
 	// ValidTagName lists the characters that are allowed in the tag names.
 	// Neither of the TagClose or AttributeSep characters should be in this
 	// list.
-	// In the default configuration this is A-Z a-z 0-9 and the asterix.
+	// In the default configuration this is A-Z a-z 0-9 and the asterisk.
 	ValidTagName string
 }
 

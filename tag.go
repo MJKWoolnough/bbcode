@@ -12,6 +12,7 @@ type Handler interface {
 	// Returning an empty string indicates that this Handler should be used
 	// for text handling.
 	Name() string
+
 	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)
 }
@@ -24,7 +25,8 @@ type Tag struct {
 
 // NewTag creates a simple Handler that outputs an open and close tag.
 // For example, the following would be used to create a tag for handling bold:
-// 	NewTag("b", []byte("<b>"), []("</b>"))
+//
+//	NewTag("b", []byte("<b>"), []("</b>"))
 func NewTag(name string, open, close []byte) *Tag {
 	return &Tag{
 		name:  name,
@@ -108,12 +110,13 @@ type AttributeTag struct {
 // errors, or to validate. If a nil slice is returned, then no attribute is
 // outputted.
 // For example the following would create a colour tag for handling font colour:
-// 	NewAttributeTag("colour",
-// 		[]byte("<span"),
-// 		[]byte(">"),
-// 		[]byte(" style=\"color: "),
-// 		[]byte("\""),
-// 		[]byte("</span>"),
+//
+//	NewAttributeTag("colour",
+//		[]byte("<span"),
+//		[]byte(">"),
+//		[]byte(" style=\"color: "),
+//		[]byte("\""),
+//		[]byte("</span>"),
 //		colourChecker)
 //
 // A nil filter means that the attr will be written to the output with HTML

@@ -10,6 +10,7 @@ Package bbcode implements a bbcode parser and converter
 var (
 	// HTMLText is a text processor that will HTML encode all text output.
 	HTMLText htmlText
+
 	// PlainText is a text processor that just outputs all text with no change.
 	PlainText plainText
 )
@@ -231,6 +232,7 @@ type Handler interface {
 	// Returning an empty string indicates that this Handler should be used
 	// for text handling.
 	Name() string
+
 	// Handle takes a pointer to the Processor and the attribute to the tag.
 	Handle(*Processor, string)
 }

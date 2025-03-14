@@ -8,6 +8,7 @@ import (
 var (
 	// HTMLText is a text processor that will HTML encode all text output.
 	HTMLText htmlText
+
 	// PlainText is a text processor that just outputs all text with no change.
 	PlainText plainText
 )

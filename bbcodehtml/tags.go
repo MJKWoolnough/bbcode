@@ -76,6 +76,17 @@ var (
 	List  list
 	Table table
 	URL   url
+
+	All = []bbcode.Handler{
+		Align, LeftAlign, CentreAlign, CenterAlign, RightAlign, FullAlign,
+		Colour, Color,
+		Font,
+		Bold, Italic, Strikethough, Underline,
+		Size,
+		Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, Heading7,
+		Quote,
+		Code, Image, List, Table, URL,
+	}
 )
 
 func alignFilter(attr string) []byte {

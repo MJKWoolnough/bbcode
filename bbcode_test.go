@@ -32,6 +32,7 @@ func TestParse(t *testing.T) {
 			AttrFilterFunc(passFilter),
 		),
 	)
+
 	for n, test := range []struct {
 		Input, Output string
 	}{
@@ -50,6 +51,7 @@ func TestParse(t *testing.T) {
 	} {
 		buf.Reset()
 		b.ConvertString(buf, test.Input)
+
 		if str := buf.String(); str != test.Output {
 			t.Errorf("test %d: expecting %q, got %q", n+1, test.Output, str)
 		}

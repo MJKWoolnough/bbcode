@@ -27,38 +27,14 @@ var (
 )
 
 func (list) Handle(p *bbcode.Processor, attr string) {
-	closer := oListClose
-
-	switch attr {
-	case "a":
-		p.Write(oaList)
-	case "A":
-		p.Write(oAList)
-	case "i":
-		p.Write(oiList)
-	case "I":
-		p.Write(oIList)
-	case "1":
-		p.Write(o1List)
-	default:
-		p.Write(uListOpen)
-
-		closer = uListClose
-	}
-
+	closer := writeListOpener(p, attr)
 	t := p.Get()
-
-	var processed bool
 
 	if text, ok := t.(bbcode.Text); ok && strings.HasPrefix(strings.TrimLeftFunc(text[0], unicode.IsSpace), "*") {
 		p.Write(liOpen)
 		handleLiText(p, text)
 		p.Write(liClose)
-
-		processed = true
-	}
-
-	if !processed {
+	} else {
 	Loop:
 		for {
 			switch t := t.(type) {
@@ -80,6 +56,27 @@ func (list) Handle(p *bbcode.Processor, attr string) {
 	}
 
 	p.Write(closer)
+}
+
+func writeListOpener(p *bbcode.Processor, attr string) []byte {
+	switch attr {
+	case "a":
+		p.Write(oaList)
+	case "A":
+		p.Write(oAList)
+	case "i":
+		p.Write(oiList)
+	case "I":
+		p.Write(oIList)
+	case "1":
+		p.Write(o1List)
+	default:
+		p.Write(uListOpen)
+
+		return uListClose
+	}
+
+	return oListClose
 }
 
 func handleLi(p *bbcode.Processor) bool {

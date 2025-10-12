@@ -8,7 +8,7 @@ import (
 
 func TestTokeniser(t *testing.T) {
 	tks := getTokeniser(defaultConfig)
-Loop:
+
 	for n, test := range [...]struct {
 		Input  string
 		Output []parser.Phrase
@@ -311,30 +311,29 @@ Loop:
 		},
 	} {
 		tk := tks.getParser(parser.NewStringTokeniser(test.Input))
+
 		for m, phrase := range test.Output {
-			p, err := tk.GetPhrase()
-			if err != nil {
+			if p, err := tk.GetPhrase(); err != nil {
 				t.Errorf("test %d.%d: unexpected error: %s", n+1, m+1, err)
-			}
-			if phrase.Type != p.Type {
+			} else if phrase.Type != p.Type {
 				t.Errorf("test %d.%d: expecting phrase type %d, got %d", n+1, m+1, phrase.Type, p.Type)
-				break Loop
-			}
-			if len(phrase.Data) != len(p.Data) {
+			} else if len(phrase.Data) != len(p.Data) {
 				t.Errorf("test %d.%d: expecting %d tokens, got %d", n+1, m+1, len(phrase.Data), len(p.Data))
-				break Loop
-			}
-			for l, token := range phrase.Data {
-				if token.Type != p.Data[l].Type {
-					t.Errorf("test %d.%d.%d: expecting token type %d, got %d", n+1, m+1, l+1, token.Type, p.Data[l].Type)
-					break Loop
-				}
-				if token.Data != p.Data[l].Data {
-					t.Errorf("test %d.%d.%d: expecting token data %q, got %q", n+1, m+1, l+1, token.Data, p.Data[l].Data)
-					break Loop
+			} else {
+				for l, token := range phrase.Data {
+					if token.Type != p.Data[l].Type {
+						t.Errorf("test %d.%d.%d: expecting token type %d, got %d", n+1, m+1, l+1, token.Type, p.Data[l].Type)
+
+						break
+					} else if token.Data != p.Data[l].Data {
+						t.Errorf("test %d.%d.%d: expecting token data %q, got %q", n+1, m+1, l+1, token.Data, p.Data[l].Data)
+
+						break
+					}
 				}
 			}
 		}
+
 		if p, _ := tk.GetPhrase(); p.Type != parser.PhraseDone {
 			t.Errorf("test %d: more tokens to check", n+1)
 		}

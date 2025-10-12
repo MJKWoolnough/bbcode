@@ -1,4 +1,4 @@
-// Package bbcode implements a bbcode parser and converter
+// Package bbcode implements a bbcode parser and converter.
 package bbcode // import "vimagination.zapto.org/bbcode"
 
 import (

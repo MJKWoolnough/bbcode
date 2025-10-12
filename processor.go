@@ -8,7 +8,7 @@ import (
 	"vimagination.zapto.org/parser"
 )
 
-// Processor contains methods necessary for creating custom Handler's.
+// Processor contains methods necessary for creating custom Handlers.
 type Processor struct {
 	w      io.Writer
 	err    error

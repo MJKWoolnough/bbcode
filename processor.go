@@ -117,7 +117,7 @@ func (p *Processor) getTagHandler(name string) Handler {
 
 // Get returns the next token.
 // It will be either a Text, OpenTag or a CloseTag.
-func (p *Processor) Get() interface{} {
+func (p *Processor) Get() any {
 	phrase, _ := p.p.GetPhrase()
 
 	switch phrase.Type {
@@ -148,7 +148,7 @@ func (p *Processor) Get() interface{} {
 
 // Print writes the textual representation of the given token to the output,
 // using the text Handler.
-func (p *Processor) Print(t interface{}) {
+func (p *Processor) Print(t any) {
 	switch t := t.(type) {
 	case string:
 		p.bbCode.text.Handle(p, t)
